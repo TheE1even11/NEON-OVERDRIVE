@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NEON OVERDRIVE // Cyber Typing Racer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05030a;
+      --cyan: #00f0ff;
+      --magenta: #ff0077;
+      --yellow: #ffe600;
+      --purple: #8b00ff;
+      --dark-purple: #1a0826;
+      --white: #f5f5ff;
+      --font-display: 'Orbitron', -apple-system, sans-serif;
+      --font-mono: 'Share Tech Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg);
+      font-family: var(--font-display);
+      color: var(--white);
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1b0a2a 0%, #05030a 100%);
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    /* CRT Scanline Overlay */
+    .scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 3px, 6px 100%;
+    }
+
+    /* HUD Layer */
+    #hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .hud-panel {
+      background: rgba(10, 4, 20, 0.75);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 10px rgba(0, 240, 255, 0.1);
+      padding: 10px 18px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    .hud-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .hud-value {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--white);
+      text-shadow: 0 0 8px var(--cyan);
+    }
+
+    .hud-sub {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--yellow);
+    }
+
+    /* Health / Shield Bar */
+    .hull-bar-container {
+      width: 140px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 0, 119, 0.5);
+      margin-top: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    #hull-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--magenta), var(--yellow));
+      transition: width 0.2s ease-out;
+      box-shadow: 0 0 8px var(--magenta);
+    }
+
+    /* Target Reticle Floating Tracker */
+    #target-display {
+      position: absolute;
+      bottom: 210px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.1s ease-out;
+    }
+
+    .target-word-box {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      background: rgba(5, 3, 10, 0.85);
+      border: 2px solid var(--cyan);
+      border-radius: 8px;
+      padding: 8px 24px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
+      display: flex;
+    }
+
+    .char-typed {
+      color: var(--yellow);
+      text-shadow: 0 0 10px var(--yellow), 0 0 20px var(--magenta);
+    }
+    .char-current {
+      color: var(--white);
+      text-decoration: underline;
+      animation: pulse-char 0.4s infinite alternate;
+    }
+    .char-remaining {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    @keyframes pulse-char {
+      from { color: #ffffff; text-shadow: 0 0 4px #fff; }
+      to { color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
+    }
+
+    /* Virtual Touch Keyboard for Mobile */
+    #virtual-keyboard {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 620px;
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 8;
+      pointer-events: auto;
+    }
+
+    .v-row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .v-key {
+      flex: 1;
+      height: 44px;
+      max-width: 52px;
+      background: rgba(20, 10, 35, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 6px;
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 0 rgba(0, 240, 255, 0.2);
+      transition: all 0.05s ease;
+    }
+
+    .v-key:active, .v-key.active {
+      transform: translateY(2px);
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 15px var(--cyan);
+    }
+
+    .v-key.v-key-wide {
+      flex: 1.5;
+      font-size: 12px;
+    }
+
+    /* Overlays & Modals */
+    .screen-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 3, 10, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.25s ease;
+    }
+
+    .screen-modal.hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    .title-glitch {
+      font-size: clamp(28px, 6vw, 64px);
+      font-weight: 900;
+      letter-spacing: 6px;
+      background: linear-gradient(180deg, #fff 0%, var(--cyan) 60%, var(--magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-family: var(--font-mono);
+      font-size: clamp(12px, 2.5vw, 16px);
+      color: var(--yellow);
+      letter-spacing: 4px;
+      margin-bottom: 28px;
+    }
+
+    .neon-button {
+      background: transparent;
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      padding: 14px 40px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.2);
+      transition: all 0.15s ease;
+      position: relative;
+      margin: 8px;
+      outline: none;
+    }
+
+    .neon-button:hover, .neon-button:focus {
+      background: var(--cyan);
+      color: var(--bg);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
+      transform: scale(1.04);
+    }
+
+    .neon-button:active {
+      transform: scale(0.98);
+    }
+
+    .neon-button-mag {
+      border-color: var(--magenta);
+      color: var(--magenta);
+      box-shadow: 0 0 15px rgba(255, 0, 119, 0.3), inset 0 0 10px rgba(255, 0, 119, 0.2);
+    }
+    .neon-button-mag:hover {
+      background: var(--magenta);
+      color: var(--white);
+      box-shadow: 0 0 30px rgba(255, 0, 119, 0.8);
+    }
+
+    .leaderboard-box {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 7, 28, 0.85);
+      border: 1px solid rgba(255, 230, 0, 0.3);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-family: var(--font-mono);
+    }
+
+    .leaderboard-title {
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+      margin-bottom: 10px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      font-size: 14px;
+    }
+    .score-row.highlight {
+      color: var(--cyan);
+      font-weight: bold;
+      text-shadow: 0 0 8px var(--cyan);
+    }
+
+    .instructions-card {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 480px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px 18px;
+      border-radius: 6px;
+      border-left: 3px solid var(--cyan);
+    }
+
+    /* Pause icon button */
+    #pause-btn {
+      pointer-events: auto;
+      cursor: pointer;
+      background: rgba(10, 4, 20, 0.6);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #hud {
+        padding: 10px;
+      }
+      .hud-panel {
+        padding: 6px 10px;
+      }
+      .hud-value {
+        font-size: 18px;
+      }
+      #target-display {
+        bottom: 180px;
+      }
+      .target-word-box {
+        font-size: 20px;
+        letter-spacing: 2px;
+        padding: 6px 16px;
+      }
+      #virtual-keyboard {
+        display: flex;
+      }
+    }
+
+    /* Hidden native input for mobile IME support fallback */
+    #hidden-input {
+      position: absolute;
+      opacity: 0;
+      left: -9999px;
+      top: -9999px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <canvas id="race-canvas"></canvas>
+  <div class="scanlines"></div>
+
+  <!-- HUD Overlay -->
+  <div id="hud">
+    <div class="hud-panel">
+      <div class="hud-label">VELOCITY</div>
+      <div class="hud-value" id="hud-speed">0 <span style="font-size:12px">KM/H</span></div>
+      <div class="hud-sub" id="hud-gear">GEAR 1 // BOOST x1.0</div>
+    </div>
+
+    <div class="hud-panel" style="text-align: center;">
+      <div class="hud-label">HULL INTEGRITY</div>
+      <div class="hull-bar-container">
+        <div id="hull-fill"></div>
+      </div>
+      <div class="hud-sub" id="hud-hull-pct" style="margin-top: 4px;">100%</div>
+    </div>
+
+    <div class="hud-panel" style="text-align: right;">
+      <div class="hud-label">DATA SCORE</div>
+      <div class="hud-value" id="hud-score">000000</div>
+      <div class="hud-sub" id="hud-wpm">0 WPM | 100% ACC</div>
+      <button id="pause-btn" style="margin-top: 6px;">[ESC] PAUSE</button>
+    </div>
+  </div>
+
+  <!-- Floating Active Word Reticle -->
+  <div id="target-display">
+    <div class="target-word-box" id="target-word-box">
+      <span class="char-remaining">READY...</span>
+    </div>
+  </div>
+
+  <!-- Mobile On-Screen Cyber Keyboard -->
+  <div id="virtual-keyboard">
+    <div class="v-row">
+      <div class="v-key" data-key="q">Q</div>
+      <div class="v-key" data-key="w">W</div>
+      <div class="v-key" data-key="e">E</div>
+      <div class="v-key" data-key="r">R</div>
+      <div class="v-key" data-key="t">T</div>
+      <div class="v-key" data-key="y">Y</div>
+      <div class="v-key" data-key="u">U</div>
+      <div class="v-key" data-key="i">I</div>
+      <div class="v-key" data-key="o">O</div>
+      <div class="v-key" data-key="p">P</div>
+    </div>
+    <div class="v-row">
+      <div class="v-key" data-key="a">A</div>
+      <div class="v-key" data-key="s">S</div>
+      <div class="v-key" data-key="d">D</div>
+      <div class="v-key" data-key="f">F</div>
+      <div class="v-key" data-key="g">G</div>
+      <div class="v-key" data-key="h">H</div>
+      <div class="v-key" data-key="j">J</div>
+      <div class="v-key" data-key="k">K</div>
+      <div class="v-key" data-key="l">L</div>
+    </div>
+    <div class="v-row">
+      <div class="v-key v-key-wide" data-key="Backspace">DEL</div>
+      <div class="v-key" data-key="z">Z</div>
+      <div class="v-key" data-key="x">X</div>
+      <div class="v-key" data-key="c">C</div>
+      <div class="v-key" data-key="v">V</div>
+      <div class="v-key" data-key="b">B</div>
+      <div class="v-key" data-key="n">N</div>
+      <div class="v-key" data-key="m">M</div>
+      <div class="v-key v-key-wide" data-key="Escape">ESC</div>
+    </div>
+  </div>
+
+  <!-- Hidden input for mobile keyboard binding -->
+  <input type="text" id="hidden-input" autocomplete="off" autocapitalize="none" spellcheck="false" />
+
+  <!-- Start Screen Modal -->
+  <div id="start-modal" class="screen-modal">
+    <h1 class="title-glitch">NEON OVERDRIVE</h1>
+    <p class="subtitle">// SYNTH CYBERSPACE TYPING RACER //</p>
+
+    <div class="instructions-card">
+      &gt; Type the code-phrases hovering over rival drone cars.<br>
+      &gt; Each locked word fires Nitro Thrusters & accelerates velocity.<br>
+      &gt; Avoid letting rival drones collide with your hull.<br>
+      &gt; Chain words without errors to fuel Multiplier Overdrive!
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <button class="neon-button" id="start-btn">ENGAGE [SPACE]</button>
+    </div>
+
+    <div class="leaderboard-box">
+      <div class="leaderboard-title">HALL OF CYBER-RACERS</div>
+      <div id="start-leaderboard-list"></div>
+    </div>
+  </div>
+
+  <!-- Pause Screen Modal -->
+  <div id="pause-modal" class="screen-modal hidden">
+    <h2 class="title-glitch" style="font-size: 38px;">SYSTEM PAUSED</h2>
+    <p class="subtitle">SYNCHRONIZATION FROZEN</p>
+    <div style="display: flex; flex-direction: column; width: 240px;">
+      <button class="neon-button" id="resume-btn">RESUME [ESC]</button>
+      <button class="neon-button neon-button-mag" id="pause-restart-btn">REBOOT [R]</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen Modal -->
+  <div id="gameover-modal" class="screen-modal hidden">
+    <h2 class="title-glitch" style="font-size: 44px; color: var(--magenta);">TERMINATION</h2>
+    <p class="subtitle" id="gameover-reason">HULL COMPROMISED // CRITICAL IMPACT</p>
+
+    <div class="leaderboard-box">
+      <div class="score-row"><span>FINAL SCORE</span><span id="final-score" style="color:var(--yellow); font-weight:bold;">0</span></div>
+      <div class="score-row"><span>PEAK VELOCITY</span><span id="final-speed">0 KM/H</span></div>
+      <div class="score-row"><span>AVERAGE SPEED</span><span id="final-wpm">0 WPM</span></div>
+      <div class="score-row"><span>PRECISION ACCURACY</span><span id="final-acc">0%</span></div>
+      <div class="score-row"><span>DRONES OVERTAKEN</span><span id="final-words">0</span></div>
+    </div>
+
+    <div class="leaderboard-box">
+      <div class="leaderboard-title">UPDATED RANKINGS</div>
+      <div id="gameover-leaderboard-list"></div>
+    </div>
+
+    <div>
+      <button class="neon-button" id="restart-btn">QUICK RESTART [R]</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/**
+ * NEON OVERDRIVE - Complete Audio, Particle, & Game Engine
+ */
+
+// ==========================================
+// 1. SYNTHESIZED WEB AUDIO ENGINE (ZERO ASSETS NEEDED)
+// ==========================================
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  playKeypress(pitchMod = 1) {
+    if (this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'triangle';
+    // Pentatonic scale note based on mod
+    const baseFreq = 523.25; // C5
+    osc.frequency.setValueAtTime(baseFreq * pitchMod, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * pitchMod * 1.5, now + 0.04);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  playWordComplete() {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // Dual synth blast chord
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+      gain.gain.setValueAtTime(0.07, now + idx * 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now + idx * 0.03);
+      osc.stop(now + 0.32);
+    });
+  }
+
+  playTypo() {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.linearRampToValueAtTime(70, now + 0.12);
+
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.12);
+  }
+
+  playImpact() {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // Low rumble boom
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(80, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+}
+
+const audio = new SoundEngine();
+
+// ==========================================
+// 2. WORD POOL & DICTIONARY
+// ==========================================
+const WORDS_TIER_1 = [
+  "neon", "grid", "hack", "flow", "rush", "warp", "wave", "sync", "byte", "core",
+  "fast", "over", "gear", "race", "beam", "volt", "zero", "apex", "dash", "slip",
+  "zoom", "fire", "fuel", "jump", "link", "port", "disk", "node", "wire", "chip"
+];
+
+const WORDS_TIER_2 = [
+  "matrix", "vector", "stream", "cyber", "plasma", "turbos", "driver", "engine",
+  "octane", "hyper", "boost", "thrust", "switch", "binary", "system", "neural",
+  "shield", "tracer", "rocket", "signal", "photon", "glitch", "arcade", "dynamo"
+];
+
+const WORDS_TIER_3 = [
+  "overdrive", "slipstream", "supercharge", "accelerate", "cybernetics",
+  "subroutine", "afterburner", "tachyonburst", "wavelength", "mainframe",
+  "interceptor", "transmission", "retrothruster", "combustion", "velocity"
+];
+
+// ==========================================
+// 3. PERSPECTIVE ROAD & VEHICLE CONSTANTS
+// ==========================================
+const ROAD_LANES = [-1.4, 0, 1.4]; // X offsets in 3D world space
+const CAMERA_HEIGHT = 1000;
+const CAMERA_DEPTH = 0.8;
+const ROAD_SEGMENT_LENGTH = 200;
+const ROAD_TOTAL_LENGTH = 16000;
+
+class Particle {
+  constructor(x, y, vx, vy, color, size, life) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.color = color;
+    this.size = size;
+    this.maxLife = life;
+    this.life = life;
+  }
+
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.life -= dt;
+  }
+
+  draw(ctx) {
+    const alpha = Math.max(0, this.life / this.maxLife);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class FloatingText {
+  constructor(text, x, y, color = '#00f0ff') {
+    this.text = text;
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.life = 0.8;
+    this.maxLife = 0.8;
+  }
+
+  update(dt) {
+    this.y -= 45 * dt;
+    this.life -= dt;
+  }
+
+  draw(ctx) {
+    const alpha = Math.max(0, this.life / this.maxLife);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = this.color;
+    ctx.font = '900 20px "Orbitron", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = this.color;
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.restore();
+  }
+}
+
+// Rival drone car class
+class RivalDrone {
+  constructor(z, laneIdx, word) {
+    this.z = z;
+    this.laneIdx = laneIdx;
+    this.x = ROAD_LANES[laneIdx];
+    this.word = word;
+    this.typedChars = 0;
+    this.speed = 140; // Base speed relative to world
+    this.defeated = false;
+    this.color = ['#ff0077', '#00f0ff', '#ffe600', '#a855f7'][Math.floor(Math.random() * 4)];
+  }
+
+  update(dt) {
+    this.z += this.speed * dt;
+  }
+}
+
+// ==========================================
+// 4. MAIN GAME ENGINE
+// ==========================================
+class NeonRacer {
+  constructor() {
+    this.canvas = document.getElementById('race-canvas');
+    this.ctx = this.canvas.getContext('2d');
+
+    // State
+    this.state = 'START'; // START, PLAYING, PAUSED, GAMEOVER
+    this.lastTime = 0;
+
+    // Player Stats
+    this.playerX = 0; // -1 to 1 lane sway
+    this.targetPlayerX = 0;
+    this.playerZ = 0; // position along road
+    this.speed = 160; // KM/H
+    this.baseSpeed = 160;
+    this.maxSpeed = 380;
+    this.hull = 100;
+    this.score = 0;
+    this.multiplier = 1.0;
+    this.streak = 0;
+
+    // Typing Metrics
+    this.keystrokes = 0;
+    this.correctKeystrokes = 0;
+    this.wordsTypedCount = 0;
+    this.startTime = 0;
+
+    // Active targeting
+    this.drones = [];
+    this.activeDrone = null;
+    this.nextSpawnZ = 1200;
+
+    // Visual Polish
+    this.shake = 0;
+    this.particles = [];
+    this.floatingTexts = [];
+    this.gridOffset = 0;
+    this.sunScanlines = 0;
+
+    // High Scores
+    this.highScores = this.loadScores();
+
+    this.bindEvents();
+    this.resize();
+    this.updateLeaderboardsUI();
+    
+    // Start game loop
+    requestAnimationFrame((t) => this.loop(t));
+  }
+
+  loadScores() {
+    try {
+      const data = localStorage.getItem('neon_overdrive_scores');
+      return data ? JSON.parse(data) : [
+        { score: 45000, wpm: 78, date: 'CYBER-PRO' },
+        { score: 32000, wpm: 64, date: 'SYNTH-RUNNER' },
+        { score: 21000, wpm: 52, date: 'GRID-RACER' },
+        { score: 14000, wpm: 40, date: 'NOVICE-PILOT' },
+        { score: 8000,  wpm: 32, date: 'RECRUIT' }
+      ];
+    } catch(e) {
+      return [{ score: 20000, wpm: 50, date: 'RACER' }];
+    }
+  }
+
+  saveScores(newEntry) {
+    this.highScores.push(newEntry);
+    this.highScores.sort((a, b) => b.score - a.score);
+    this.highScores = this.highScores.slice(0, 5);
+    try {
+      localStorage.setItem('neon_overdrive_scores', JSON.stringify(this.highScores));
+    } catch(e) {}
+    this.updateLeaderboardsUI();
+  }
+
+  updateLeaderboardsUI() {
+    const renderList = (elementId) => {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.innerHTML = this.highScores.map((item, idx) => `
+        <div class="score-row ${item.current ? 'highlight' : ''}">
+          <span>#${idx+1} ${item.date}</span>
+          <span>${item.wpm} WPM &bull; ${item.score.toLocaleString()} PTS</span>
+        </div>
+      `).join('');
+    };
+
+    renderList('start-leaderboard-list');
+    renderList('gameover-leaderboard-list');
+  }
+
+  resize() {
+    const dpr = window.devicePixelRatio || 1;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.canvas.width = this.width * dpr;
+    this.canvas.height = this.height * dpr;
+    this.ctx.scale(dpr, dpr);
+  }
+
+  bindEvents() {
+    window.addEventListener('resize', () => this.resize());
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      audio.init();
+
+      if (e.key === 'Escape') {
+        if (this.state === 'PLAYING') this.pauseGame();
+        else if (this.state === 'PAUSED') this.resumeGame();
+        return;
+      }
+
+      if (e.key.toLowerCase() === 'r') {
+        if (this.state === 'GAMEOVER' || this.state === 'PAUSED') {
+          this.startGame();
+          return;
+        }
+      }
+
+      if (this.state === 'START' && (e.key === ' ' || e.key === 'Enter')) {
+        this.startGame();
+        return;
+      }
+
+      if (this.state === 'PLAYING') {
+        // Prevent default space navigation
+        if (e.key === ' ') e.preventDefault();
+        this.handleTypingInput(e.key);
+      }
+    });
+
+    // Mobile Virtual Keyboard Handling
+    const vKeys = document.querySelectorAll('.v-key');
+    vKeys.forEach(key => {
+      key.addEventListener('pointerdown', (ev) => {
+        ev.preventDefault();
+        audio.init();
+        const k = key.getAttribute('data-key');
+        key.classList.add('active');
+        setTimeout(() => key.classList.remove('active'), 100);
+
+        if (this.state === 'PLAYING') {
+          this.handleTypingInput(k);
+        }
+      });
+    });
+
+    // Modal buttons
+    document.getElementById('start-btn').addEventListener('click', () => {
+      audio.init();
+      this.startGame();
+    });
+
+    document.getElementById('pause-btn').addEventListener('click', () => {
+      if (this.state === 'PLAYING') this.pauseGame();
+      else if (this.state === 'PAUSED') this.resumeGame();
+    });
+
+    document.getElementById('resume-btn').addEventListener('click', () => this.resumeGame());
+    document.getElementById('pause-restart-btn').addEventListener('click', () => this.startGame());
+    document.getElementById('restart-btn').addEventListener('click', () => this.startGame());
+
+    // Window focus / pause
+    window.addEventListener('blur', () => {
+      if (this.state === 'PLAYING') this.pauseGame();
+    });
+
+    // Tap canvas to focus hidden input on mobile
+    this.canvas.addEventListener('pointerdown', () => {
+      audio.init();
+      const inp = document.getElementById('hidden-input');
+      if (inp) inp.focus();
+    });
+
+    // Hidden input support for mobile native keyboard
+    const hiddenInput = document.getElementById('hidden-input');
+    hiddenInput.addEventListener('input', (e) => {
+      if (this.state === 'PLAYING' && hiddenInput.value.length > 0) {
+        const char = hiddenInput.value.slice(-1);
+        this.handleTypingInput(char);
+        hiddenInput.value = '';
+      }
+    });
+  }
+
+  getRandomWord() {
+    let pool;
+    if (this.speed < 210) pool = WORDS_TIER_1;
+    else if (this.speed < 300) pool = WORDS_TIER_2;
+    else pool = WORDS_TIER_3;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  startGame() {
+    this.state = 'PLAYING';
+    this.playerZ = 0;
+    this.speed = this.baseSpeed;
+    this.hull = 100;
+    this.score = 0;
+    this.multiplier = 1.0;
+    this.streak = 0;
+    this.keystrokes = 0;
+    this.correctKeystrokes = 0;
+    this.wordsTypedCount = 0;
+    this.startTime = performance.now();
+    this.drones = [];
+    this.activeDrone = null;
+    this.nextSpawnZ = 900;
+    this.shake = 0;
+    this.particles = [];
+    this.floatingTexts = [];
+
+    // Hide modals
+    document.getElementById('start-modal').classList.add('hidden');
+    document.getElementById('pause-modal').classList.add('hidden');
+    document.getElementById('gameover-modal').classList.add('hidden');
+
+    // Spawn initial wave of rivals
+    for (let i = 0; i < 3; i++) {
+      this.spawnRival(1200 + i * 750);
+    }
+
+    this.selectClosestTarget();
+    this.updateHUD();
+  }
+
+  pauseGame() {
+    this.state = 'PAUSED';
+    document.getElementById('pause-modal').classList.remove('hidden');
+  }
+
+  resumeGame() {
+    this.state = 'PLAYING';
+    this.lastTime = performance.now();
+    document.getElementById('pause-modal').classList.add('hidden');
+  }
+
+  gameOver(reason = "HULL INTEGRITY COMPROMISED") {
+    this.state = 'GAMEOVER';
+    this.shake = 0.5;
+    audio.playImpact();
+
+    const elapsedMin = Math.max(0.1, (performance.now() - this.startTime) / 60000);
+    const wpm = Math.round((this.correctKeystrokes / 5) / elapsedMin);
+    const acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
+
+    // Register new high score
+    const entry = {
+      score: Math.floor(this.score),
+      wpm: wpm,
+      date: `RUNNER-${Math.floor(100 + Math.random() * 899)}`,
+      current: true
+    };
+    this.saveScores(entry);
+
+    document.getElementById('gameover-reason').innerText = reason;
+    document.getElementById('final-score').innerText = Math.floor(this.score).toLocaleString();
+    document.getElementById('final-speed').innerText = `${Math.floor(this.speed)} KM/H`;
+    document.getElementById('final-wpm').innerText = `${wpm} WPM`;
+    document.getElementById('final-acc').innerText = `${acc}%`;
+    document.getElementById('final-words').innerText = this.wordsTypedCount;
+
+    document.getElementById('gameover-modal').classList.remove('hidden');
+  }
+
+  spawnRival(zDistance) {
+    const lane = Math.floor(Math.random() * 3);
+    const word = this.getRandomWord();
+    const drone = new RivalDrone(zDistance, lane, word);
+    this.drones.push(drone);
+  }
+
+  selectClosestTarget() {
+    if (this.drones.length === 0) return;
+    // Sort by distance to player (z relative to player)
+    const validDrones = this.drones.filter(d => !d.defeated && d.z > this.playerZ);
+    if (validDrones.length > 0) {
+      validDrones.sort((a, b) => a.z - b.z);
+      this.activeDrone = validDrones[0];
+      this.targetPlayerX = this.activeDrone.x * 0.45; // steer smoothly toward target lane
+      this.updateTargetDisplay();
+    } else {
+      this.activeDrone = null;
+      this.updateTargetDisplay();
+    }
+  }
+
+  handleTypingInput(key) {
+    if (!key || key.length !== 1 && key !== 'Backspace') return;
+
+    if (key === 'Backspace') {
+      if (this.activeDrone && this.activeDrone.typedChars > 0) {
+        this.activeDrone.typedChars--;
+        this.updateTargetDisplay();
+      }
+      return;
+    }
+
+    const inputChar = key.toLowerCase();
+    this.keystrokes++;
+
+    // If no active drone or target already passed
+    if (!this.activeDrone || this.activeDrone.defeated || this.activeDrone.z <= this.playerZ) {
+      // Find any incoming drone that starts with this key
+      const match = this.drones.find(d => !d.defeated && d.z > this.playerZ && d.word[0].toLowerCase() === inputChar);
+      if (match) {
+        this.activeDrone = match;
+        this.targetPlayerX = this.activeDrone.x * 0.45;
+      } else {
+        this.triggerTypoPenalty();
+        return;
+      }
+    }
+
+    const currentExpectedChar = this.activeDrone.word[this.activeDrone.typedChars].toLowerCase();
+
+    if (inputChar === currentExpectedChar) {
+      // CORRECT KEYPRESS
+      this.correctKeystrokes++;
+      this.activeDrone.typedChars++;
+      this.streak++;
+      this.multiplier = Math.min(4.0, 1.0 + Math.floor(this.streak / 6) * 0.5);
+
+      // Pitch variance based on progress
+      const pitchRatio = 1 + (this.activeDrone.typedChars / this.activeDrone.word.length) * 0.6;
+      audio.playKeypress(pitchRatio);
+
+      // Spawn sparks behind player car
+      this.createKeySparks();
+
+      // Check if word completed
+      if (this.activeDrone.typedChars >= this.activeDrone.word.length) {
+        this.completeWordOnDrone(this.activeDrone);
+      } else {
+        this.updateTargetDisplay();
+      }
+    } else {
+      // TYPO PENALTY
+      this.triggerTypoPenalty();
+    }
+
+    this.updateHUD();
+  }
+
+  triggerTypoPenalty() {
+    audio.playTypo();
+    this.shake = 0.15;
+    this.streak = 0;
+    this.multiplier = 1.0;
+    this.speed = Math.max(120, this.speed - 20); // Velocity hiccup
+
+    const targetBox = document.getElementById('target-word-box');
+    targetBox.style.borderColor = '#ff0055';
+    targetBox.style.boxShadow = '0 0 25px #ff0055';
+    setTimeout(() => {
+      targetBox.style.borderColor = 'var(--cyan)';
+      targetBox.style.boxShadow = '0 0 25px rgba(0, 240, 255, 0.4)';
+    }, 180);
+
+    this.floatingTexts.push(new FloatingText("MISS!", this.width / 2, this.height / 2 - 80, '#ff0077'));
+  }
+
+  completeWordOnDrone(drone) {
+    drone.defeated = true;
+    this.wordsTypedCount++;
+    audio.playWordComplete();
+
+    // Boost & Nitro surge
+    this.speed = Math.min(this.maxSpeed, this.speed + 45);
+    const wordBonus = drone.word.length * 150 * this.multiplier;
+    this.score += wordBonus;
+
+    // Screen Shake & Nitro visual
+    this.shake = 0.35;
+    this.createDroneExplosion(drone);
+
+    this.floatingTexts.push(
+      new FloatingText(`+${Math.floor(wordBonus)} OVERDRIVE!`, this.width / 2, this.height / 2 - 100, '#ffe600')
+    );
+
+    // Auto-select next candidate
+    setTimeout(() => {
+      this.selectClosestTarget();
+    }, 50);
+  }
+
+  createKeySparks() {
+    const bottomY = this.height * 0.82;
+    const centerX = this.width / 2 + this.playerX * 120;
+    for (let i = 0; i < 6; i++) {
+      this.particles.push(new Particle(
+        centerX + (Math.random() - 0.5) * 40,
+        bottomY,
+        (Math.random() - 0.5) * 140,
+        (Math.random() * -120) - 40,
+        Math.random() > 0.5 ? '#00f0ff' : '#ffe600',
+        Math.random() * 3 + 2,
+        0.35
+      ));
+    }
+  }
+
+  createDroneExplosion(drone) {
+    const projected = this.project3D(drone.x, 0, drone.z - this.playerZ);
+    if (!projected) return;
+
+    for (let i = 0; i < 40; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 300 + 100;
+      this.particles.push(new Particle(
+        projected.x,
+        projected.y,
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed,
+        Math.random() > 0.3 ? drone.color : '#ffffff',
+        Math.random() * 4 + 2,
+        0.6
+      ));
+    }
+  }
+
+  updateTargetDisplay() {
+    const box = document.getElementById('target-word-box');
+    if (!this.activeDrone || this.activeDrone.defeated) {
+      box.innerHTML = `<span class="char-remaining">SCANNING...</span>`;
+      return;
+    }
+
+    const word = this.activeDrone.word;
+    const typed = this.activeDrone.typedChars;
+    let html = '';
+
+    for (let i = 0; i < word.length; i++) {
+      if (i < typed) {
+        html += `<span class="char-typed">${word[i]}</span>`;
+      } else if (i === typed) {
+        html += `<span class="char-current">${word[i]}</span>`;
+      } else {
+        html += `<span class="char-remaining">${word[i]}</span>`;
+      }
+    }
+    box.innerHTML = html;
+  }
+
+  updateHUD() {
+    document.getElementById('hud-speed').innerHTML = `${Math.floor(this.speed)} <span style="font-size:12px">KM/H</span>`;
+    document.getElementById('hud-gear').innerText = `BOOST x${this.multiplier.toFixed(1)} // STREAK ${this.streak}`;
+    document.getElementById('hud-score').innerText = Math.floor(this.score).toString().padStart(6, '0');
+
+    // Health
+    const hullFill = document.getElementById('hull-fill');
+    hullFill.style.width = `${Math.max(0, this.hull)}%`;
+    document.getElementById('hud-hull-pct').innerText = `${Math.max(0, Math.round(this.hull))}%`;
+
+    // Metrics
+    const elapsedMinutes = Math.max(0.01, (performance.now() - this.startTime) / 60000);
+    const currentWPM = Math.round((this.correctKeystrokes / 5) / elapsedMinutes);
+    const accuracy = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
+    document.getElementById('hud-wpm').innerText = `${currentWPM} WPM | ${accuracy}% ACC`;
+  }
+
+  // Perspective 3D Coordinate Mapping
+  project3D(worldX, worldY, worldZ) {
+    if (worldZ <= 0) return null;
+    const cameraDist = 320;
+    const scale = cameraDist / worldZ;
+    const centerX = this.width / 2;
+    const centerY = this.height * 0.52; // Horizon line
+
+    return {
+      x: centerX + (worldX * 420 - this.playerX * 180) * scale,
+      y: centerY + (worldY + 280) * scale,
+      scale: scale
+    };
+  }
+
+  // ==========================================
+  // 5. UPDATE AND RENDER PIPELINE (60 FPS)
+  // ==========================================
+  update(dt) {
+    if (this.state !== 'PLAYING') return;
+
+    // Advance player road position
+    const worldStep = this.speed * 8 * dt;
+    this.playerZ += worldStep;
+    this.score += (this.speed * 0.1) * dt;
+
+    // Speed decay towards base speed
+    if (this.speed > this.baseSpeed) {
+      this.speed -= 14 * dt;
+    }
+
+    // Smooth camera steering
+    this.playerX += (this.targetPlayerX - this.playerX) * 8 * dt;
+
+    // Decay trauma shake
+    if (this.shake > 0) {
+      this.shake = Math.max(0, this.shake - 1.5 * dt);
+    }
+
+    // Spawn drones ahead
+    if (this.playerZ + 2400 > this.nextSpawnZ) {
+      this.spawnRival(this.nextSpawnZ + 800);
+      this.nextSpawnZ += 750 + Math.random() * 400;
+    }
+
+    // Update Drones and check Collisions
+    for (let i = this.drones.length - 1; i >= 0; i--) {
+      const drone = this.drones[i];
+      drone.update(dt);
+
+      const relativeZ = drone.z - this.playerZ;
+
+      // Drone passed behind player
+      if (relativeZ < -150) {
+        if (!drone.defeated) {
+          // Player hit or was overtaken without typing
+          this.hull -= 28;
+          audio.playImpact();
+          this.shake = 0.45;
+          this.multiplier = 1.0;
+          this.streak = 0;
+          this.speed = Math.max(100, this.speed - 50);
+          this.floatingTexts.push(new FloatingText("COLLISION! -28%", this.width / 2, this.height / 2, '#ff0055'));
+
+          if (this.hull <= 0) {
+            this.gameOver("HULL BREACHED // COLLISION DETECTED");
+            return;
+          }
+        }
+        this.drones.splice(i, 1);
+        if (this.activeDrone === drone) {
+          this.selectClosestTarget();
+        }
+      }
+    }
+
+    // Check if active target has moved behind player
+    if (this.activeDrone && (this.activeDrone.z - this.playerZ) <= 0) {
+      this.selectClosestTarget();
+    }
+
+    // Update particles
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      this.particles[i].update(dt);
+      if (this.particles[i].life <= 0) this.particles.splice(i, 1);
+    }
+
+    // Update floating texts
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      this.floatingTexts[i].update(dt);
+      if (this.floatingTexts[i].life <= 0) this.floatingTexts.splice(i, 1);
+    }
+
+    this.updateHUD();
+  }
+
+  draw() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+
+    this.ctx.save();
+    // Screen shake translation
+    if (this.shake > 0) {
+      const shakeMag = this.shake * 18;
+      const ox = (Math.random() - 0.5) * shakeMag;
+      const oy = (Math.random() - 0.5) * shakeMag;
+      this.ctx.translate(ox, oy);
+    }
+
+    this.renderSkyAndSun();
+    this.render3DRoad();
+    this.renderRivalDrones();
+    this.renderPlayerVehicle();
+
+    // Render Particles
+    for (let p of this.particles) {
+      p.draw(this.ctx);
+    }
+
+    // Render Floating Notification Texts
+    for (let ft of this.floatingTexts) {
+      ft.draw(this.ctx);
+    }
+
+    this.ctx.restore();
+  }
+
+  renderSkyAndSun() {
+    const horizon = this.height * 0.52;
+
+    // Retro Sun
+    const sunRadius = Math.min(this.width, this.height) * 0.16;
+    const sunX = this.width / 2 - (this.playerX * 60);
+    const sunY = horizon - sunRadius * 0.45;
+
+    const sunGrad = this.ctx.createLinearGradient(sunX, sunY - sunRadius, sunX, sunY + sunRadius);
+    sunGrad.addColorStop(0, '#ffe600');
+    sunGrad.addColorStop(0.5, '#ff0077');
+    sunGrad.addColorStop(1, '#8b00ff');
+
+    this.ctx.save();
+    this.ctx.fillStyle = sunGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Synth horizontal scanlines slicing the sun
+    this.ctx.fillStyle = 'rgba(5, 3, 10, 0.9)';
+    const stripeCount = 9;
+    for (let i = 0; i < stripeCount; i++) {
+      const stripeY = sunY + (i / stripeCount) * sunRadius;
+      const stripeHeight = 2 + i * 1.5;
+      this.ctx.fillRect(sunX - sunRadius, stripeY, sunRadius * 2, stripeHeight);
+    }
+    this.ctx.restore();
+
+    // Distant Neon Grid Skyline Mountain Silhouettes
+    this.ctx.save();
+    this.ctx.fillStyle = '#0f051d';
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, horizon);
+    const segments = 12;
+    for (let i = 0; i <= segments; i++) {
+      const px = (this.width / segments) * i;
+      const py = horizon - ((i % 2 === 0) ? 35 : 15);
+      this.ctx.lineTo(px, py);
+    }
+    this.ctx.lineTo(this.width, horizon);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
+  render3DRoad() {
+    const horizon = this.height * 0.52;
+    const roadBottomW = this.width * 1.35;
+    const roadTopW = this.width * 0.05;
+    const centerX = this.width / 2 - (this.playerX * 180);
+
+    // Dark Road Surface
+    this.ctx.save();
+    const roadGrad = this.ctx.createLinearGradient(0, horizon, 0, this.height);
+    roadGrad.addColorStop(0, '#0a0316');
+    roadGrad.addColorStop(1, '#1b092f');
+    this.ctx.fillStyle = roadGrad;
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX - roadTopW / 2, horizon);
+    this.ctx.lineTo(centerX + roadTopW / 2, horizon);
+    this.ctx.lineTo(this.width / 2 + roadBottomW / 2, this.height);
+    this.ctx.lineTo(this.width / 2 - roadBottomW / 2, this.height);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Road Border Glow Lines
+    this.ctx.strokeStyle = '#00f0ff';
+    this.ctx.lineWidth = 4;
+    this.ctx.shadowBlur = 15;
+    this.ctx.shadowColor = '#00f0ff';
+    this.ctx.beginPath();
+    // Left edge
+    this.ctx.moveTo(centerX - roadTopW / 2, horizon);
+    this.ctx.lineTo(this.width / 2 - roadBottomW / 2, this.height);
+    // Right edge
+    this.ctx.moveTo(centerX + roadTopW / 2, horizon);
+    this.ctx.lineTo(this.width / 2 + roadBottomW / 2, this.height);
+    this.ctx.stroke();
+
+    // Animated Neon Horizontal Ground Grid Bands
+    const totalBands = 20;
+    const cycle = (this.playerZ % 300) / 300;
+    for (let i = 0; i < totalBands; i++) {
+      const p = (i + cycle) / totalBands;
+      const y = horizon + Math.pow(p, 2.5) * (this.height - horizon);
+      const halfW = (roadTopW / 2) + Math.pow(p, 2.5) * (roadBottomW / 2);
+
+      this.ctx.strokeStyle = `rgba(255, 0, 119, ${0.15 + p * 0.45})`;
+      this.ctx.lineWidth = 1 + p * 2;
+      this.ctx.beginPath();
+      this.ctx.moveTo(centerX - halfW, y);
+      this.ctx.lineTo(centerX + halfW, y);
+      this.ctx.stroke();
+    }
+
+    // Lane Dividers
+    [-0.45, 0.45].forEach(laneOffset => {
+      this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+      this.ctx.lineWidth = 2;
+      this.ctx.beginPath();
+      this.ctx.moveTo(centerX + (roadTopW * laneOffset), horizon);
+      this.ctx.lineTo(this.width / 2 + (roadBottomW * laneOffset), this.height);
+      this.ctx.stroke();
+    });
+
+    this.ctx.restore();
+  }
+
+  renderRivalDrones() {
+    // Sort from farthest to nearest for correct painter's depth
+    const sorted = [...this.drones].sort((a, b) => b.z - a.z);
+
+    sorted.forEach(drone => {
+      const relZ = drone.z - this.playerZ;
+      if (relZ <= 40 || relZ > 2800) return;
+
+      const p = this.project3D(drone.x, 0, relZ);
+      if (!p) return;
+
+      const scale = p.scale;
+      const droneW = 120 * scale;
+      const droneH = 45 * scale;
+      const isTarget = (this.activeDrone === drone);
+
+      this.ctx.save();
+      this.ctx.translate(p.x, p.y);
+
+      // Target Reticle Box around active candidate
+      if (isTarget && !drone.defeated) {
+        this.ctx.strokeStyle = '#00f0ff';
+        this.ctx.lineWidth = 2;
+        this.ctx.shadowBlur = 12;
+        this.ctx.shadowColor = '#00f0ff';
+        const boxPad = 25 * scale;
+        this.ctx.strokeRect(-droneW / 2 - boxPad, -droneH - boxPad, droneW + boxPad * 2, droneH + boxPad * 1.5);
+      }
+
+      // Drone Cybercraft Body
+      this.ctx.fillStyle = drone.defeated ? '#555555' : '#140c26';
+      this.ctx.strokeStyle = drone.defeated ? '#777777' : drone.color;
+      this.ctx.lineWidth = 3 * scale + 1;
+      this.ctx.shadowBlur = drone.defeated ? 0 : 15;
+      this.ctx.shadowColor = drone.color;
+
+      // Wedge shape fuselage
+      this.ctx.beginPath();
+      this.ctx.moveTo(-droneW / 2, -5 * scale);
+      this.ctx.lineTo(0, -droneH);
+      this.ctx.lineTo(droneW / 2, -5 * scale);
+      this.ctx.lineTo(droneW * 0.35, 0);
+      this.ctx.lineTo(-droneW * 0.35, 0);
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.stroke();
+
+      // Glowing Thruster Exhaust
+      if (!drone.defeated) {
+        this.ctx.fillStyle = drone.color;
+        this.ctx.beginPath();
+        this.ctx.arc(0, -5 * scale, 8 * scale, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      // Word Billboard Rendered Over Drone
+      if (!drone.defeated) {
+        const fontSize = Math.max(12, Math.floor(26 * scale));
+        this.ctx.font = `bold ${fontSize}px "Share Tech Mono", monospace`;
+        this.ctx.textAlign = 'center';
+
+        const textY = -droneH - 18 * scale;
+        const word = drone.word;
+        const typed = drone.typedChars;
+
+        // Background pill behind word for ultra-high contrast readability
+        const textMetrics = this.ctx.measureText(word);
+        const pillW = textMetrics.width + 16 * scale;
+        const pillH = fontSize + 8 * scale;
+
+        this.ctx.fillStyle = 'rgba(5, 3, 10, 0.85)';
+        this.ctx.strokeStyle = isTarget ? '#00f0ff' : 'rgba(255,255,255,0.2)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.beginPath();
+        this.ctx.roundRect(-pillW / 2, textY - pillH + 4 * scale, pillW, pillH, 4 * scale);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        // Render matched letters in Gold, pending in Crisp White
+        const fullWordWidth = textMetrics.width;
+        let startCharX = -fullWordWidth / 2;
+
+        for (let i = 0; i < word.length; i++) {
+          const char = word[i];
+          const charWidth = this.ctx.measureText(char).width;
+          const charCenterX = startCharX + charWidth / 2;
+
+          if (i < typed) {
+            this.ctx.fillStyle = '#ffe600';
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = '#ffe600';
+          } else if (i === typed && isTarget) {
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.shadowBlur = 12;
+            this.ctx.shadowColor = '#00f0ff';
+          } else {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            this.ctx.shadowBlur = 0;
+          }
+
+          this.ctx.fillText(char, charCenterX, textY);
+          startCharX += charWidth;
+        }
+      }
+
+      this.ctx.restore();
+    });
+  }
+
+  renderPlayerVehicle() {
+    const bottomY = this.height * 0.86;
+    const centerX = this.width / 2 + (this.playerX * 120);
+    const tilt = (this.targetPlayerX - this.playerX) * 0.6; // Banking turn tilt
+
+    const carW = 120;
+    const carH = 50;
+
+    this.ctx.save();
+    this.ctx.translate(centerX, bottomY);
+    this.ctx.rotate(tilt);
+
+    // Underglow Neon Shadow
+    this.ctx.shadowBlur = 30;
+    this.ctx.shadowColor = '#00f0ff';
+    this.ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+    this.ctx.fillRect(-carW * 0.6, -10, carW * 1.2, 25);
+
+    // Aerodynamic Cyber Chassis
+    this.ctx.fillStyle = '#0d071c';
+    this.ctx.strokeStyle = '#00f0ff';
+    this.ctx.lineWidth = 3;
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(-carW / 2, 10);
+    this.ctx.lineTo(-carW * 0.38, -carH * 0.6);
+    this.ctx.lineTo(-carW * 0.2, -carH);
+    this.ctx.lineTo(carW * 0.2, -carH);
+    this.ctx.lineTo(carW * 0.38, -carH * 0.6);
+    this.ctx.lineTo(carW / 2, 10);
+    this.ctx.lineTo(carW * 0.3, 14);
+    this.ctx.lineTo(-carW * 0.3, 14);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    // Twin High-Intensity Taillights
+    this.ctx.fillStyle = '#ff0055';
+    this.ctx.shadowColor = '#ff0055';
+    this.ctx.shadowBlur = 20;
+    this.ctx.fillRect(-carW * 0.42, -5, 24, 7);
+    this.ctx.fillRect(carW * 0.42 - 24, -5, 24, 7);
+
+    // Nitro Jet Flames
+    const isBoosting = this.speed > 240;
+    const flameLen = isBoosting ? 40 + Math.random() * 25 : 15 + Math.random() * 10;
+    const flameGrad = this.ctx.createLinearGradient(0, 10, 0, 10 + flameLen);
+    flameGrad.addColorStop(0, '#ffffff');
+    flameGrad.addColorStop(0.3, '#00f0ff');
+    flameGrad.addColorStop(1, 'rgba(255, 0, 119, 0)');
+
+    this.ctx.fillStyle = flameGrad;
+    this.ctx.beginPath();
+    this.ctx.moveTo(-16, 12);
+    this.ctx.lineTo(0, 12 + flameLen);
+    this.ctx.lineTo(16, 12);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    this.ctx.restore();
+  }
+
+  // ==========================================
+  // 6. MAIN ANIMATION LOOP
+  // ==========================================
+  loop(timestamp) {
+    if (!this.lastTime) this.lastTime = timestamp;
+    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1); // Clamp delta
+    this.lastTime = timestamp;
+
+    this.update(dt);
+    this.draw();
+
+    requestAnimationFrame((t) => this.loop(t));
+  }
+}
+
+// Launch Game once DOM finishes parsing
+window.addEventListener('DOMContentLoaded', () => {
+  window.racerGame = new NeonRacer();
+});
+</script>
+</body>
+</html>
