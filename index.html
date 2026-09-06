@@ -6,16 +6,15 @@
   <title>NEON OVERDRIVE // Cyber Typing Racer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #05030a;
       --cyan: #00f0ff;
       --magenta: #ff0077;
       --yellow: #ffe600;
-      --purple: #8b00ff;
-      --dark-card: rgba(14, 8, 28, 0.92);
       --white: #f5f5ff;
+      --dark-card: rgba(14, 8, 28, 0.94);
       --font-display: 'Orbitron', -apple-system, sans-serif;
       --font-mono: 'Share Tech Mono', monospace;
     }
@@ -61,7 +60,6 @@
       z-index: 1;
     }
 
-    /* CRT Scanline Overlay */
     .scanlines {
       position: absolute;
       top: 0;
@@ -70,9 +68,8 @@
       height: 100%;
       pointer-events: none;
       z-index: 10;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-      background-size: 100% 3px, 6px 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
+      background-size: 100% 3px;
     }
 
     /* Top HUD */
@@ -90,9 +87,8 @@
     }
 
     .hud-panel {
-      background: rgba(10, 4, 22, 0.8);
+      background: rgba(10, 4, 22, 0.85);
       border: 1px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.15);
       padding: 6px 12px;
       border-radius: 6px;
       backdrop-filter: blur(4px);
@@ -106,11 +102,11 @@
     }
 
     .hud-value {
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 900;
       letter-spacing: 1px;
       color: var(--white);
-      text-shadow: 0 0 8px var(--cyan);
+      text-shadow: 0 0 6px var(--cyan);
     }
 
     .hud-sub {
@@ -120,7 +116,7 @@
     }
 
     .hull-bar-container {
-      width: 110px;
+      width: 100px;
       height: 8px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 0, 119, 0.5);
@@ -134,13 +130,12 @@
       height: 100%;
       background: linear-gradient(90deg, var(--magenta), var(--yellow));
       transition: width 0.2s ease-out;
-      box-shadow: 0 0 8px var(--magenta);
     }
 
-    /* Target Reticle Display (Positioned High to Never Be Obscured) */
+    /* Target Reticle Display (Top Center) */
     #target-display {
       position: absolute;
-      top: 72px;
+      top: 65px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 6;
@@ -148,7 +143,7 @@
       flex-direction: column;
       align-items: center;
       width: 90%;
-      max-width: 440px;
+      max-width: 420px;
       pointer-events: auto;
     }
 
@@ -157,11 +152,11 @@
       font-size: 26px;
       font-weight: bold;
       letter-spacing: 3px;
-      background: rgba(5, 3, 14, 0.92);
+      background: rgba(5, 3, 14, 0.94);
       border: 2px solid var(--cyan);
       border-radius: 8px;
       padding: 6px 18px;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
       display: flex;
       justify-content: center;
       width: 100%;
@@ -170,7 +165,7 @@
 
     .char-typed {
       color: var(--yellow);
-      text-shadow: 0 0 8px var(--yellow), 0 0 16px var(--magenta);
+      text-shadow: 0 0 8px var(--yellow);
     }
     .char-current {
       color: var(--white);
@@ -183,20 +178,19 @@
 
     @keyframes pulse-char {
       from { color: #fff; text-shadow: 0 0 4px #fff; }
-      to { color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
+      to { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
     }
 
-    /* Cyber Mobile Input Bar (Visible & Focused to Prevent Dismissal) */
+    /* Stable Mobile Input Bar */
     #mobile-input-bar {
       margin-top: 8px;
       width: 100%;
       display: flex;
       align-items: center;
-      background: rgba(12, 6, 24, 0.9);
+      background: rgba(12, 6, 24, 0.95);
       border: 1px solid var(--yellow);
       border-radius: 6px;
       padding: 4px 8px;
-      box-shadow: 0 0 10px rgba(255, 230, 0, 0.25);
     }
 
     #native-text-input {
@@ -213,7 +207,7 @@
 
     #native-text-input::placeholder {
       color: rgba(255, 255, 255, 0.35);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     #kb-mode-toggle {
@@ -228,14 +222,14 @@
       white-space: nowrap;
     }
 
-    /* Virtual Touch Keyboard */
+    /* On-Screen Touch Keyboard */
     #virtual-keyboard {
       position: absolute;
       bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 580px;
+      max-width: 540px;
       padding: 4px 6px;
       display: none;
       flex-direction: column;
@@ -260,20 +254,18 @@
       border-radius: 6px;
       color: var(--white);
       font-family: var(--font-display);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 3px 0 rgba(0, 240, 255, 0.2);
     }
 
     .v-key:active, .v-key.active {
       transform: translateY(2px);
       background: var(--cyan);
       color: #000;
-      box-shadow: 0 0 12px var(--cyan);
     }
 
     .v-key-wide {
@@ -281,7 +273,7 @@
       font-size: 11px;
     }
 
-    /* Modal Windows */
+    /* Modals */
     .screen-modal {
       position: absolute;
       top: 0;
@@ -289,7 +281,7 @@
       width: 100%;
       height: 100%;
       background: rgba(6, 3, 14, 0.92);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -297,33 +289,28 @@
       z-index: 25;
       padding: 16px;
       text-align: center;
-      opacity: 1;
-      transition: opacity 0.2s ease;
     }
 
     .screen-modal.hidden {
-      opacity: 0;
-      pointer-events: none;
       display: none !important;
     }
 
     .title-glitch {
-      font-size: clamp(26px, 6vw, 54px);
+      font-size: clamp(26px, 5.5vw, 50px);
       font-weight: 900;
       letter-spacing: 4px;
       background: linear-gradient(180deg, #fff 0%, var(--cyan) 60%, var(--magenta) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
       margin-bottom: 4px;
     }
 
     .subtitle {
       font-family: var(--font-mono);
-      font-size: clamp(11px, 2.2vw, 14px);
+      font-size: clamp(11px, 2vw, 13px);
       color: var(--yellow);
       letter-spacing: 3px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .button-group {
@@ -332,12 +319,12 @@
       justify-content: center;
       gap: 10px;
       margin: 10px 0;
-      max-width: 480px;
+      max-width: 460px;
       pointer-events: auto;
     }
 
     .neon-button {
-      background: rgba(8, 4, 18, 0.75);
+      background: rgba(8, 4, 18, 0.85);
       border: 2px solid var(--cyan);
       color: var(--cyan);
       font-family: var(--font-display);
@@ -348,42 +335,36 @@
       text-transform: uppercase;
       border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
       transition: all 0.15s ease;
     }
 
     .neon-button:hover, .neon-button:active {
       background: var(--cyan);
       color: #05030a;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
       transform: scale(1.03);
     }
 
     .neon-button-mag {
       border-color: var(--magenta);
       color: var(--magenta);
-      box-shadow: 0 0 12px rgba(255, 0, 119, 0.3);
     }
     .neon-button-mag:hover, .neon-button-mag:active {
       background: var(--magenta);
       color: #fff;
-      box-shadow: 0 0 25px rgba(255, 0, 119, 0.8);
     }
 
     .neon-button-yel {
       border-color: var(--yellow);
       color: var(--yellow);
-      box-shadow: 0 0 12px rgba(255, 230, 0, 0.3);
     }
     .neon-button-yel:hover, .neon-button-yel:active {
       background: var(--yellow);
       color: #05030a;
-      box-shadow: 0 0 25px rgba(255, 230, 0, 0.8);
     }
 
     .leaderboard-box {
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       background: var(--dark-card);
       border: 1px solid rgba(255, 230, 0, 0.3);
       border-radius: 8px;
@@ -411,13 +392,12 @@
     .score-row.highlight {
       color: var(--cyan);
       font-weight: bold;
-      text-shadow: 0 0 8px var(--cyan);
     }
     .no-score-text {
       font-size: 11px;
       color: rgba(255, 255, 255, 0.45);
       text-align: center;
-      padding: 8px 0;
+      padding: 6px 0;
     }
 
     .instructions-card {
@@ -425,7 +405,7 @@
       font-size: 12px;
       line-height: 1.6;
       color: rgba(255, 255, 255, 0.88);
-      max-width: 460px;
+      max-width: 440px;
       text-align: left;
       background: rgba(255, 255, 255, 0.04);
       padding: 12px 16px;
@@ -446,27 +426,13 @@
       font-size: 11px;
     }
 
-    /* Mobile Responsive Optimizations */
     @media (max-width: 768px) {
-      #hud {
-        padding: 6px 10px;
-      }
-      .hud-panel {
-        padding: 4px 8px;
-      }
-      .hud-value {
-        font-size: 15px;
-      }
-      .hull-bar-container {
-        width: 75px;
-      }
-      #target-display {
-        top: 60px;
-      }
-      .target-word-box {
-        font-size: 20px;
-        padding: 5px 12px;
-      }
+      #hud { padding: 6px 10px; }
+      .hud-panel { padding: 4px 8px; }
+      .hud-value { font-size: 15px; }
+      .hull-bar-container { width: 75px; }
+      #target-display { top: 56px; }
+      .target-word-box { font-size: 20px; padding: 4px 12px; }
     }
   </style>
 </head>
@@ -476,7 +442,7 @@
   <canvas id="race-canvas"></canvas>
   <div class="scanlines"></div>
 
-  <!-- HUD Overlay -->
+  <!-- HUD -->
   <div id="hud">
     <div class="hud-panel">
       <div class="hud-label">VELOCITY</div>
@@ -485,7 +451,7 @@
     </div>
 
     <div class="hud-panel" style="text-align: center;">
-      <div class="hud-label">HULL SHIELD</div>
+      <div class="hud-label">HULL INTEGRITY</div>
       <div class="hull-bar-container">
         <div id="hull-fill"></div>
       </div>
@@ -493,14 +459,14 @@
     </div>
 
     <div class="hud-panel" style="text-align: right;">
-      <div class="hud-label">DATA SCORE</div>
+      <div class="hud-label">SCORE</div>
       <div class="hud-value" id="hud-score">000000</div>
       <div class="hud-sub" id="hud-wpm">0 WPM</div>
       <button id="pause-btn" style="margin-top: 3px;">PAUSE ⏸</button>
     </div>
   </div>
 
-  <!-- Top Unobscured Target Reticle & Mobile Cyber Input Bar -->
+  <!-- Target & Mobile Input -->
   <div id="target-display">
     <div class="target-word-box" id="target-word-box">
       <span class="char-remaining">READY...</span>
@@ -511,7 +477,7 @@
     </div>
   </div>
 
-  <!-- Virtual Touch Keyboard for Mobile (Optional mode) -->
+  <!-- Virtual Touch Keyboard -->
   <div id="virtual-keyboard">
     <div class="v-row">
       <div class="v-key" data-key="q">Q</div>
@@ -549,10 +515,10 @@
     </div>
   </div>
 
-  <!-- 1. MAIN MENU SCREEN -->
+  <!-- Main Menu -->
   <div id="start-modal" class="screen-modal">
     <h1 class="title-glitch">NEON OVERDRIVE</h1>
-    <p class="subtitle">// SYNTH CYBERSPACE TYPING RACER //</p>
+    <p class="subtitle">// HIGH-SPEED CYBER TYPING RACER //</p>
 
     <div class="button-group">
       <button class="neon-button" id="start-btn">ENGAGE [SPACE]</button>
@@ -565,11 +531,11 @@
     </div>
   </div>
 
-  <!-- 2. PAUSE MENU SCREEN -->
+  <!-- Pause Screen -->
   <div id="pause-modal" class="screen-modal hidden">
-    <h2 class="title-glitch" style="font-size: 34px;">SYSTEM PAUSED</h2>
+    <h2 class="title-glitch" style="font-size: 32px;">SYSTEM PAUSED</h2>
     <p class="subtitle">RACE TEMPORARILY FROZEN</p>
-    <div class="button-group" style="flex-direction: column; width: 230px;">
+    <div class="button-group" style="flex-direction: column; width: 220px;">
       <button class="neon-button" id="resume-btn">RESUME</button>
       <button class="neon-button neon-button-yel" id="how-to-play-btn-pause">HOW TO PLAY</button>
       <button class="neon-button" id="pause-restart-btn">RESTART</button>
@@ -577,33 +543,32 @@
     </div>
   </div>
 
-  <!-- 3. HOW TO PLAY MODAL SCREEN -->
+  <!-- How to Play -->
   <div id="how-to-play-modal" class="screen-modal hidden" style="z-index: 30;">
-    <h2 class="title-glitch" style="font-size: 30px; color: var(--yellow);">HOW TO PLAY</h2>
+    <h2 class="title-glitch" style="font-size: 28px; color: var(--yellow);">HOW TO PLAY</h2>
     <p class="subtitle">CYBER HIGHWAY SURVIVAL GUIDE</p>
 
     <div class="instructions-card">
-      ⚡ <b>CORE OBJECTIVE:</b> Type the words floating above rival drones to eliminate them.<br><br>
-      🚀 <b>NITRO SURGE:</b> Completing words surges your thrusters, multiplying speed and score multiplier.<br><br>
-      💥 <b>COLLISIONS:</b> Overtaken drones will crash into your hull, depleting your shields.<br><br>
-      🎯 <b>COMBO STREAK:</b> Perfect typing chains unlock up to <b>x4.0</b> Overdrive score multiplier.<br><br>
-      📱 <b>MOBILE TYPING:</b> Tap the input bar to type with your native keyboard, or toggle the on-screen keypad anytime!
+      ⚡ <b>ONE TARGET AT A TIME:</b> Lock onto the nearest drone ahead and type its floating code-word.<br><br>
+      🚀 <b>NITRO BOOST:</b> Each completed word triggers thrusters, surging your velocity and streak multiplier.<br><br>
+      💥 <b>SAFE SPACING:</b> Rival drones approach in a spaced sequence. Don't let them crash into your rear!<br><br>
+      📱 <b>MOBILE CONTROLS:</b> Tap the input bar to use your phone's native keyboard, or switch to the on-screen keys.
     </div>
 
     <button class="neon-button" id="close-how-to-play-btn">GOT IT / CLOSE</button>
   </div>
 
-  <!-- 4. GAME OVER SCREEN -->
+  <!-- Game Over -->
   <div id="gameover-modal" class="screen-modal hidden">
-    <h2 class="title-glitch" style="font-size: 36px; color: var(--magenta);">MISSION FAILED</h2>
-    <p class="subtitle" id="gameover-reason">HULL INTEGRITY COMPROMISED</p>
+    <h2 class="title-glitch" style="font-size: 34px; color: var(--magenta);">MISSION FAILED</h2>
+    <p class="subtitle" id="gameover-reason">HULL COMPROMISED</p>
 
     <div class="leaderboard-box">
       <div class="score-row"><span>FINAL SCORE</span><span id="final-score" style="color:var(--yellow); font-weight:bold;">0</span></div>
       <div class="score-row"><span>TOP VELOCITY</span><span id="final-speed">0 KM/H</span></div>
       <div class="score-row"><span>TYPING SPEED</span><span id="final-wpm">0 WPM</span></div>
       <div class="score-row"><span>ACCURACY</span><span id="final-acc">0%</span></div>
-      <div class="score-row"><span>DRONES OVERTAKEN</span><span id="final-words">0</span></div>
+      <div class="score-row"><span>DRONES DESTROYED</span><span id="final-words">0</span></div>
     </div>
 
     <div class="leaderboard-box">
@@ -620,12 +585,8 @@
 </div>
 
 <script>
-/**
- * NEON OVERDRIVE - Robust Cyberpunk Synthwave Engine
- */
-
 // ==========================================
-// 1. SYNTHESIZED WEB AUDIO ENGINE
+// 1. SYNTHESIZED SOUND ENGINE (ZERO ASSETS)
 // ==========================================
 class SoundEngine {
   constructor() {
@@ -654,7 +615,7 @@ class SoundEngine {
       osc.type = 'triangle';
       const baseFreq = 523.25;
       osc.frequency.setValueAtTime(baseFreq * pitchMod, now);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * pitchMod * 1.35, now + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * pitchMod * 1.3, now + 0.04);
 
       gain.gain.setValueAtTime(0.08, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
@@ -670,19 +631,19 @@ class SoundEngine {
     if (!this.unlocked || !this.ctx) return;
     try {
       const now = this.ctx.currentTime;
-      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+      [523.25, 659.25, 783.99].forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(freq, now + idx * 0.03);
 
-        gain.gain.setValueAtTime(0.07, now + idx * 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now + idx * 0.03);
-        osc.stop(now + 0.3);
+        osc.stop(now + 0.28);
       });
     } catch(e) {}
   }
@@ -695,16 +656,16 @@ class SoundEngine {
       const gain = this.ctx.createGain();
 
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(130, now);
-      osc.frequency.linearRampToValueAtTime(65, now + 0.12);
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.linearRampToValueAtTime(60, now + 0.1);
 
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.12);
+      osc.stop(now + 0.1);
     } catch(e) {}
   }
 
@@ -715,16 +676,16 @@ class SoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'square';
-      osc.frequency.setValueAtTime(85, now);
-      osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+      osc.frequency.setValueAtTime(80, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
 
-      gain.gain.setValueAtTime(0.28, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.35);
+      osc.stop(now + 0.3);
     } catch(e) {}
   }
 }
@@ -732,7 +693,7 @@ class SoundEngine {
 const audio = new SoundEngine();
 
 // ==========================================
-// 2. ENGLISH WORD POOLS
+// 2. WORD POOLS
 // ==========================================
 const WORDS_EASY = [
   "neon", "grid", "data", "flux", "code", "warp", "byte", "core", "flow", "link",
@@ -747,11 +708,11 @@ const WORDS_HARD = [
   "subroutine", "afterburner", "tachyonburst", "interceptor", "combustion"
 ];
 
-// ==========================================
-// 3. PERSPECTIVE ROAD CONSTANTS & ENTITIES
-// ==========================================
-const ROAD_LANES = [-1.4, 0, 1.4];
+const ROAD_LANES = [-1.3, 0, 1.3];
 
+// ==========================================
+// 3. FAST PARTICLES (NO SHADOWBLUR)
+// ==========================================
 class Particle {
   constructor(x, y, vx, vy, color, size, life) {
     this.x = x;
@@ -773,8 +734,6 @@ class Particle {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = this.color;
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
@@ -788,11 +747,11 @@ class FloatingText {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.life = 0.85;
-    this.maxLife = 0.85;
+    this.life = 0.8;
+    this.maxLife = 0.8;
   }
   update(dt) {
-    this.y -= 45 * dt;
+    this.y -= 40 * dt;
     this.life -= dt;
   }
   draw(ctx) {
@@ -800,10 +759,8 @@ class FloatingText {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = this.color;
-    ctx.font = '900 18px "Orbitron", sans-serif';
+    ctx.font = '800 17px "Orbitron", sans-serif';
     ctx.textAlign = 'center';
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = this.color;
     ctx.fillText(this.text, this.x, this.y);
     ctx.restore();
   }
@@ -816,7 +773,7 @@ class RivalDrone {
     this.x = ROAD_LANES[laneIdx];
     this.word = word;
     this.typedChars = 0;
-    this.speed = 130;
+    this.speed = 100; // Controlled speed
     this.defeated = false;
     this.color = ['#ff0077', '#00f0ff', '#ffe600', '#a855f7'][Math.floor(Math.random() * 4)];
   }
@@ -831,41 +788,38 @@ class RivalDrone {
 class NeonRacer {
   constructor() {
     this.canvas = document.getElementById('race-canvas');
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d', { alpha: false });
 
     this.state = 'START';
     this.lastTime = 0;
 
-    // Player Stats
+    // Player State
     this.playerX = 0;
     this.targetPlayerX = 0;
     this.playerZ = 0;
-    this.speed = 150;
-    this.baseSpeed = 150;
-    this.maxSpeed = 380;
+    this.speed = 160;
+    this.baseSpeed = 160;
+    this.maxSpeed = 360;
     this.hull = 100;
     this.score = 0;
     this.multiplier = 1.0;
     this.streak = 0;
+    this.invulnerableTimer = 0; // Cooldown to prevent multi-hit deaths
 
-    // Metrics
+    // Stats
     this.keystrokes = 0;
     this.correctKeystrokes = 0;
     this.wordsTypedCount = 0;
     this.startTime = 0;
 
-    // Objects
+    // Strict drone pacing controls
     this.drones = [];
     this.activeDrone = null;
-    this.nextSpawnZ = 1000;
     this.shake = 0;
     this.particles = [];
     this.floatingTexts = [];
 
-    // Mobile Input Mode: 'device' or 'virtual'
     this.keyboardMode = 'device';
-
-    // High Scores (Empty initial list)
     this.highScores = this.loadScores();
 
     this.resizeCanvas();
@@ -877,7 +831,7 @@ class NeonRacer {
 
   loadScores() {
     try {
-      const data = localStorage.getItem('neon_overdrive_scores_v2');
+      const data = localStorage.getItem('neon_overdrive_scores_v3');
       return data ? JSON.parse(data) : [];
     } catch(e) {
       return [];
@@ -889,7 +843,7 @@ class NeonRacer {
     this.highScores.sort((a, b) => b.score - a.score);
     this.highScores = this.highScores.slice(0, 5);
     try {
-      localStorage.setItem('neon_overdrive_scores_v2', JSON.stringify(this.highScores));
+      localStorage.setItem('neon_overdrive_scores_v3', JSON.stringify(this.highScores));
     } catch(e) {}
     this.updateLeaderboardsUI();
   }
@@ -915,33 +869,23 @@ class NeonRacer {
   }
 
   resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for smooth mobile performance
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.canvas.width = this.width * dpr;
-    this.canvas.height = this.height * dpr;
+    this.canvas.width = Math.floor(this.width * dpr);
+    this.canvas.height = Math.floor(this.height * dpr);
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   bindEvents() {
-    // Only resize canvas on genuine orientation / window size change
-    let lastWidth = window.innerWidth;
-    window.addEventListener('resize', () => {
-      if (Math.abs(window.innerWidth - lastWidth) > 30) {
-        lastWidth = window.innerWidth;
-        this.resizeCanvas();
-      }
-    });
-
-    window.addEventListener('orientationchange', () => {
-      setTimeout(() => this.resizeCanvas(), 200);
-    });
+    window.addEventListener('resize', () => this.resizeCanvas());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.resizeCanvas(), 200));
 
     const unlockAudio = () => audio.unlock();
     window.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
     window.addEventListener('mousedown', unlockAudio, { once: true });
 
-    // Physical Keyboard Listener
+    // Keyboard
     window.addEventListener('keydown', (e) => {
       audio.unlock();
 
@@ -974,20 +918,19 @@ class NeonRacer {
       }
     });
 
-    // Native Mobile Input Element Handling (Does NOT close keyboard)
+    // Native Mobile Input Element
     const nativeInput = document.getElementById('native-text-input');
-    nativeInput.addEventListener('input', (e) => {
+    nativeInput.addEventListener('input', () => {
       if (this.state === 'PLAYING' && nativeInput.value.length > 0) {
         const char = nativeInput.value.slice(-1);
         this.handleInput(char);
       }
-      // Keep input cleanly bounded without resetting IME composition
-      if (nativeInput.value.length > 12) {
+      if (nativeInput.value.length > 8) {
         nativeInput.value = nativeInput.value.slice(-1);
       }
     });
 
-    // Mobile Keyboard Toggle Button
+    // Keyboard mode toggle
     const toggleBtn = document.getElementById('kb-mode-toggle');
     const vKb = document.getElementById('virtual-keyboard');
     toggleBtn.addEventListener('click', (ev) => {
@@ -1006,7 +949,7 @@ class NeonRacer {
       }
     });
 
-    // Virtual Touch Keys
+    // Touch virtual keys
     const vKeys = document.querySelectorAll('.v-key');
     vKeys.forEach(k => {
       k.addEventListener('pointerdown', (ev) => {
@@ -1014,7 +957,7 @@ class NeonRacer {
         audio.unlock();
         const keyVal = k.getAttribute('data-key');
         k.classList.add('active');
-        setTimeout(() => k.classList.remove('active'), 100);
+        setTimeout(() => k.classList.remove('active'), 90);
 
         if (keyVal === 'Escape') {
           if (this.state === 'PLAYING') this.pauseGame();
@@ -1027,17 +970,12 @@ class NeonRacer {
       });
     });
 
-    // Button Bindings
-    document.getElementById('start-btn').addEventListener('click', () => {
-      audio.unlock();
-      this.startGame();
-    });
-
+    // UI Buttons
+    document.getElementById('start-btn').addEventListener('click', () => { audio.unlock(); this.startGame(); });
     document.getElementById('pause-btn').addEventListener('click', () => {
       if (this.state === 'PLAYING') this.pauseGame();
       else if (this.state === 'PAUSED') this.resumeGame();
     });
-
     document.getElementById('resume-btn').addEventListener('click', () => this.resumeGame());
     document.getElementById('pause-restart-btn').addEventListener('click', () => this.startGame());
     document.getElementById('restart-btn').addEventListener('click', () => this.startGame());
@@ -1079,9 +1017,31 @@ class NeonRacer {
   getRandomWord() {
     let pool;
     if (this.speed < 200) pool = WORDS_EASY;
-    else if (this.speed < 290) pool = WORDS_MEDIUM;
+    else if (this.speed < 280) pool = WORDS_MEDIUM;
     else pool = WORDS_HARD;
     return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  // STRICT, CALM PACING: Maximum 2-3 drones with guaranteed distance
+  spawnNextDrone() {
+    const MAX_DRONES = 2; // Never more than 2 active drones on screen!
+    if (this.drones.length >= MAX_DRONES) return;
+
+    let highestZ = this.playerZ + 800;
+    let lastLane = 1;
+
+    for (let d of this.drones) {
+      if (d.z > highestZ) highestZ = d.z;
+      lastLane = d.laneIdx;
+    }
+
+    // Space out drones by at least 1100 to 1400 units
+    const spawnZ = highestZ + 1100 + Math.random() * 300;
+    const availableLanes = [0, 1, 2].filter(l => l !== lastLane);
+    const lane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+
+    const word = this.getRandomWord();
+    this.drones.push(new RivalDrone(spawnZ, lane, word));
   }
 
   startGame() {
@@ -1095,32 +1055,29 @@ class NeonRacer {
     this.keystrokes = 0;
     this.correctKeystrokes = 0;
     this.wordsTypedCount = 0;
+    this.invulnerableTimer = 0;
     this.startTime = performance.now();
     this.lastTime = performance.now();
     this.drones = [];
     this.activeDrone = null;
-    this.nextSpawnZ = 900;
     this.shake = 0;
     this.particles = [];
     this.floatingTexts = [];
 
-    // Hide modals
     document.getElementById('start-modal').classList.add('hidden');
     document.getElementById('pause-modal').classList.add('hidden');
     document.getElementById('gameover-modal').classList.add('hidden');
     document.getElementById('how-to-play-modal').classList.add('hidden');
 
-    // Focus input on mobile if in device mode
     const nativeInput = document.getElementById('native-text-input');
     nativeInput.value = '';
     if (this.keyboardMode === 'device' && window.innerWidth <= 768) {
       nativeInput.focus();
     }
 
-    // Spawn initial wave
-    for (let i = 0; i < 3; i++) {
-      this.spawnRival(1100 + i * 700);
-    }
+    // Spawn only 2 well-spaced targets to begin
+    this.drones.push(new RivalDrone(1200, 1, this.getRandomWord()));
+    this.drones.push(new RivalDrone(2400, 0, this.getRandomWord()));
 
     this.selectClosestTarget();
     this.updateHUD();
@@ -1136,7 +1093,7 @@ class NeonRacer {
   resumeGame() {
     if (this.state !== 'PAUSED') return;
     this.state = 'PLAYING';
-    this.lastTime = performance.now(); // Prevent delta time leap
+    this.lastTime = performance.now();
     document.getElementById('pause-modal').classList.add('hidden');
 
     if (this.keyboardMode === 'device' && window.innerWidth <= 768) {
@@ -1146,7 +1103,7 @@ class NeonRacer {
 
   gameOver(reason = "HULL INTEGRITY COMPROMISED") {
     this.state = 'GAMEOVER';
-    this.shake = 0.5;
+    this.shake = 0.4;
     audio.playImpact();
 
     const elapsedMin = Math.max(0.1, (performance.now() - this.startTime) / 60000);
@@ -1172,12 +1129,6 @@ class NeonRacer {
 
     document.getElementById('gameover-modal').classList.remove('hidden');
     document.getElementById('native-text-input').blur();
-  }
-
-  spawnRival(zDistance) {
-    const lane = Math.floor(Math.random() * 3);
-    const word = this.getRandomWord();
-    this.drones.push(new RivalDrone(zDistance, lane, word));
   }
 
   selectClosestTarget() {
@@ -1206,7 +1157,6 @@ class NeonRacer {
     const inputChar = key.toLowerCase();
     this.keystrokes++;
 
-    // Find candidate matching input char
     if (!this.activeDrone || this.activeDrone.defeated || this.activeDrone.z <= this.playerZ) {
       const match = this.drones.find(d => !d.defeated && d.z > this.playerZ && d.word[0].toLowerCase() === inputChar);
       if (match) {
@@ -1229,8 +1179,6 @@ class NeonRacer {
       const pitch = 1 + (this.activeDrone.typedChars / this.activeDrone.word.length) * 0.6;
       audio.playKeypress(pitch);
 
-      this.createKeySparks();
-
       if (this.activeDrone.typedChars >= this.activeDrone.word.length) {
         this.completeWord(this.activeDrone);
       } else {
@@ -1245,20 +1193,18 @@ class NeonRacer {
 
   triggerTypo() {
     audio.playTypo();
-    this.shake = 0.15;
+    this.shake = 0.12;
     this.streak = 0;
     this.multiplier = 1.0;
-    this.speed = Math.max(110, this.speed - 22);
+    this.speed = Math.max(120, this.speed - 20);
 
     const box = document.getElementById('target-word-box');
     box.style.borderColor = 'var(--magenta)';
-    box.style.boxShadow = '0 0 25px var(--magenta)';
     setTimeout(() => {
       box.style.borderColor = 'var(--cyan)';
-      box.style.boxShadow = '0 0 20px rgba(0, 240, 255, 0.4)';
-    }, 180);
+    }, 150);
 
-    this.floatingTexts.push(new FloatingText("MISS!", this.width / 2, 140, '#ff0077'));
+    this.floatingTexts.push(new FloatingText("MISS!", this.width / 2, 130, '#ff0077'));
   }
 
   completeWord(drone) {
@@ -1266,54 +1212,36 @@ class NeonRacer {
     this.wordsTypedCount++;
     audio.playWordComplete();
 
-    this.speed = Math.min(this.maxSpeed, this.speed + 40);
+    this.speed = Math.min(this.maxSpeed, this.speed + 35);
     const bonus = drone.word.length * 150 * this.multiplier;
     this.score += bonus;
 
-    this.shake = 0.3;
+    this.shake = 0.22;
     this.createExplosion(drone);
 
     this.floatingTexts.push(
-      new FloatingText(`+${Math.floor(bonus)} NITRO!`, this.width / 2, 140, '#ffe600')
+      new FloatingText(`+${Math.floor(bonus)} NITRO!`, this.width / 2, 130, '#ffe600')
     );
 
-    // Clear native input field on word completion
     document.getElementById('native-text-input').value = '';
-
-    setTimeout(() => this.selectClosestTarget(), 50);
-  }
-
-  createKeySparks() {
-    const bottomY = this.height * 0.82;
-    const centerX = this.width / 2 + this.playerX * 120;
-    for (let i = 0; i < 5; i++) {
-      this.particles.push(new Particle(
-        centerX + (Math.random() - 0.5) * 30,
-        bottomY,
-        (Math.random() - 0.5) * 120,
-        -Math.random() * 90 - 40,
-        Math.random() > 0.5 ? '#00f0ff' : '#ffe600',
-        Math.random() * 3 + 2,
-        0.3
-      ));
-    }
+    setTimeout(() => this.selectClosestTarget(), 40);
   }
 
   createExplosion(drone) {
     const p = this.project3D(drone.x, 0, drone.z - this.playerZ);
     if (!p) return;
 
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 18; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const spd = Math.random() * 260 + 80;
+      const spd = Math.random() * 200 + 60;
       this.particles.push(new Particle(
         p.x,
         p.y,
         Math.cos(angle) * spd,
         Math.sin(angle) * spd,
         drone.color,
-        Math.random() * 4 + 2,
-        0.55
+        Math.random() * 3 + 2,
+        0.45
       ));
     }
   }
@@ -1355,15 +1283,15 @@ class NeonRacer {
   }
 
   project3D(worldX, worldY, worldZ) {
-    if (worldZ <= 20) return null;
-    const cameraDist = 320;
+    if (worldZ <= 25) return null;
+    const cameraDist = 300;
     const scale = cameraDist / worldZ;
     const centerX = this.width / 2;
     const centerY = this.height * 0.52;
 
     return {
-      x: centerX + (worldX * 420 - this.playerX * 180) * scale,
-      y: centerY + (worldY + 280) * scale,
+      x: centerX + (worldX * 400 - this.playerX * 160) * scale,
+      y: centerY + (worldY + 260) * scale,
       scale: scale
     };
   }
@@ -1371,40 +1299,42 @@ class NeonRacer {
   update(dt) {
     if (this.state !== 'PLAYING') return;
 
-    this.playerZ += this.speed * 8 * dt;
+    this.playerZ += this.speed * 4.5 * dt;
     this.score += (this.speed * 0.1) * dt;
 
     if (this.speed > this.baseSpeed) {
-      this.speed -= 12 * dt;
+      this.speed -= 10 * dt;
     }
 
-    this.playerX += (this.targetPlayerX - this.playerX) * 8 * dt;
+    this.playerX += (this.targetPlayerX - this.playerX) * 7 * dt;
 
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - 1.5 * dt);
     }
 
-    // Maintain continuous wave
-    if (this.playerZ + 2200 > this.nextSpawnZ || this.drones.filter(d => !d.defeated).length < 2) {
-      this.spawnRival(Math.max(this.nextSpawnZ, this.playerZ + 900));
-      this.nextSpawnZ = this.playerZ + 1400 + Math.random() * 400;
+    if (this.invulnerableTimer > 0) {
+      this.invulnerableTimer -= dt;
     }
 
-    // Drone update & collisions
+    // Spawn smoothly without flooding
+    this.spawnNextDrone();
+
+    // Drones & single collision handler
     for (let i = this.drones.length - 1; i >= 0; i--) {
       const drone = this.drones[i];
       drone.update(dt);
       const relZ = drone.z - this.playerZ;
 
-      if (relZ < -150) {
-        if (!drone.defeated) {
-          this.hull -= 26;
+      if (relZ < -100) {
+        if (!drone.defeated && this.invulnerableTimer <= 0) {
+          this.hull -= 25;
+          this.invulnerableTimer = 1.4; // 1.4s safety buffer
           audio.playImpact();
-          this.shake = 0.4;
+          this.shake = 0.35;
           this.streak = 0;
           this.multiplier = 1.0;
-          this.speed = Math.max(100, this.speed - 45);
-          this.floatingTexts.push(new FloatingText("COLLISION! -26%", this.width / 2, this.height * 0.5, '#ff0055'));
+          this.speed = Math.max(120, this.speed - 35);
+          this.floatingTexts.push(new FloatingText("COLLISION! -25%", this.width / 2, this.height * 0.5, '#ff0055'));
 
           if (this.hull <= 0) {
             this.gameOver("CRITICAL COLLISION // HULL BREACHED");
@@ -1440,7 +1370,7 @@ class NeonRacer {
 
     this.ctx.save();
     if (this.shake > 0) {
-      const mag = this.shake * 16;
+      const mag = this.shake * 12;
       this.ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
     }
 
@@ -1449,6 +1379,7 @@ class NeonRacer {
     this.renderDrones();
     this.renderPlayer();
 
+    // Fast particles
     for (let p of this.particles) p.draw(this.ctx);
     for (let ft of this.floatingTexts) ft.draw(this.ctx);
 
@@ -1458,36 +1389,33 @@ class NeonRacer {
   renderSkyAndSun() {
     const horizon = this.height * 0.52;
     const sunRadius = Math.min(this.width, this.height) * 0.16;
-    const sunX = this.width / 2 - (this.playerX * 50);
-    const sunY = horizon - sunRadius * 0.4;
+    const sunX = this.width / 2 - (this.playerX * 40);
+    const sunY = horizon - sunRadius * 0.38;
 
     const sunGrad = this.ctx.createLinearGradient(sunX, sunY - sunRadius, sunX, sunY + sunRadius);
     sunGrad.addColorStop(0, '#ffe600');
     sunGrad.addColorStop(0.5, '#ff0077');
     sunGrad.addColorStop(1, '#8b00ff');
 
-    this.ctx.save();
     this.ctx.fillStyle = sunGrad;
     this.ctx.beginPath();
     this.ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
     this.ctx.fill();
 
-    this.ctx.fillStyle = 'rgba(5, 3, 10, 0.9)';
-    const stripes = 8;
+    this.ctx.fillStyle = '#05030a';
+    const stripes = 7;
     for (let i = 0; i < stripes; i++) {
       const sY = sunY + (i / stripes) * sunRadius;
-      this.ctx.fillRect(sunX - sunRadius, sY, sunRadius * 2, 2 + i * 1.5);
+      this.ctx.fillRect(sunX - sunRadius, sY, sunRadius * 2, 2.5 + i * 1.2);
     }
-    this.ctx.restore();
   }
 
   renderRoad() {
     const horizon = this.height * 0.52;
     const roadBottomW = this.width * 1.35;
     const roadTopW = this.width * 0.05;
-    const centerX = this.width / 2 - (this.playerX * 180);
+    const centerX = this.width / 2 - (this.playerX * 160);
 
-    this.ctx.save();
     const roadGrad = this.ctx.createLinearGradient(0, horizon, 0, this.height);
     roadGrad.addColorStop(0, '#0a0316');
     roadGrad.addColorStop(1, '#1b092f');
@@ -1501,11 +1429,9 @@ class NeonRacer {
     this.ctx.closePath();
     this.ctx.fill();
 
-    // Road Borders
+    // Road glowing borders (Direct stroke - fast)
     this.ctx.strokeStyle = '#00f0ff';
     this.ctx.lineWidth = 3;
-    this.ctx.shadowBlur = 12;
-    this.ctx.shadowColor = '#00f0ff';
     this.ctx.beginPath();
     this.ctx.moveTo(centerX - roadTopW / 2, horizon);
     this.ctx.lineTo(this.width / 2 - roadBottomW / 2, this.height);
@@ -1513,21 +1439,20 @@ class NeonRacer {
     this.ctx.lineTo(this.width / 2 + roadBottomW / 2, this.height);
     this.ctx.stroke();
 
-    // Perspective Lines
-    const cycle = (this.playerZ % 300) / 300;
-    for (let i = 0; i < 18; i++) {
-      const p = (i + cycle) / 18;
-      const y = horizon + Math.pow(p, 2.5) * (this.height - horizon);
-      const halfW = (roadTopW / 2) + Math.pow(p, 2.5) * (roadBottomW / 2);
+    // Perspective Ground Lines
+    const cycle = (this.playerZ % 240) / 240;
+    for (let i = 0; i < 14; i++) {
+      const p = (i + cycle) / 14;
+      const y = horizon + Math.pow(p, 2.4) * (this.height - horizon);
+      const halfW = (roadTopW / 2) + Math.pow(p, 2.4) * (roadBottomW / 2);
 
       this.ctx.strokeStyle = `rgba(255, 0, 119, ${0.15 + p * 0.4})`;
-      this.ctx.lineWidth = 1 + p * 2;
+      this.ctx.lineWidth = 1 + p * 1.8;
       this.ctx.beginPath();
       this.ctx.moveTo(centerX - halfW, y);
       this.ctx.lineTo(centerX + halfW, y);
       this.ctx.stroke();
     }
-    this.ctx.restore();
   }
 
   renderDrones() {
@@ -1535,59 +1460,55 @@ class NeonRacer {
 
     sorted.forEach(drone => {
       const relZ = drone.z - this.playerZ;
-      if (relZ <= 35 || relZ > 2600) return;
+      if (relZ <= 30 || relZ > 2400) return;
 
       const p = this.project3D(drone.x, 0, relZ);
       if (!p) return;
 
       const scale = p.scale;
-      const droneW = 115 * scale;
-      const droneH = 42 * scale;
+      const droneW = 110 * scale;
+      const droneH = 40 * scale;
       const isTarget = (this.activeDrone === drone);
 
       this.ctx.save();
       this.ctx.translate(p.x, p.y);
 
-      // Target Box
+      // Target Reticle Box
       if (isTarget && !drone.defeated) {
         this.ctx.strokeStyle = '#00f0ff';
         this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = '#00f0ff';
-        const pad = 20 * scale;
+        const pad = 18 * scale;
         this.ctx.strokeRect(-droneW / 2 - pad, -droneH - pad, droneW + pad * 2, droneH + pad * 1.5);
       }
 
-      // Drone Body
-      this.ctx.fillStyle = drone.defeated ? '#444' : '#140c26';
-      this.ctx.strokeStyle = drone.defeated ? '#666' : drone.color;
+      // Drone Fuselage
+      this.ctx.fillStyle = drone.defeated ? '#333' : '#140c26';
+      this.ctx.strokeStyle = drone.defeated ? '#555' : drone.color;
       this.ctx.lineWidth = 2.5 * scale + 1;
-      this.ctx.shadowBlur = drone.defeated ? 0 : 12;
-      this.ctx.shadowColor = drone.color;
 
       this.ctx.beginPath();
-      this.ctx.moveTo(-droneW / 2, -5 * scale);
+      this.ctx.moveTo(-droneW / 2, -4 * scale);
       this.ctx.lineTo(0, -droneH);
-      this.ctx.lineTo(droneW / 2, -5 * scale);
+      this.ctx.lineTo(droneW / 2, -4 * scale);
       this.ctx.lineTo(droneW * 0.3, 0);
       this.ctx.lineTo(-droneW * 0.3, 0);
       this.ctx.closePath();
       this.ctx.fill();
       this.ctx.stroke();
 
-      // Word Label Billboard
+      // Readable High-Contrast Word Pill
       if (!drone.defeated) {
-        const fontSize = Math.max(12, Math.floor(25 * scale));
+        const fontSize = Math.max(12, Math.floor(24 * scale));
         this.ctx.font = `bold ${fontSize}px "Share Tech Mono", monospace`;
         this.ctx.textAlign = 'center';
 
-        const textY = -droneH - 16 * scale;
+        const textY = -droneH - 14 * scale;
         const textMetrics = this.ctx.measureText(drone.word);
-        const pillW = textMetrics.width + 14 * scale;
-        const pillH = fontSize + 8 * scale;
+        const pillW = textMetrics.width + 12 * scale;
+        const pillH = fontSize + 6 * scale;
 
-        this.ctx.fillStyle = 'rgba(5, 3, 12, 0.88)';
-        this.ctx.strokeStyle = isTarget ? '#00f0ff' : 'rgba(255,255,255,0.2)';
+        this.ctx.fillStyle = 'rgba(5, 3, 14, 0.9)';
+        this.ctx.strokeStyle = isTarget ? '#00f0ff' : 'rgba(255,255,255,0.3)';
         this.ctx.lineWidth = 1.5;
         this.ctx.beginPath();
         this.ctx.roundRect(-pillW / 2, textY - pillH + 4 * scale, pillW, pillH, 4 * scale);
@@ -1602,15 +1523,10 @@ class NeonRacer {
 
           if (i < drone.typedChars) {
             this.ctx.fillStyle = '#ffe600';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = '#ffe600';
           } else if (i === drone.typedChars && isTarget) {
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = '#00f0ff';
           } else {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            this.ctx.shadowBlur = 0;
           }
 
           this.ctx.fillText(ch, chCenterX, textY);
@@ -1624,23 +1540,22 @@ class NeonRacer {
 
   renderPlayer() {
     const bottomY = this.height * 0.86;
-    const centerX = this.width / 2 + (this.playerX * 120);
+    const centerX = this.width / 2 + (this.playerX * 110);
     const tilt = (this.targetPlayerX - this.playerX) * 0.55;
 
-    const carW = 110;
-    const carH = 46;
+    const carW = 105;
+    const carH = 44;
 
     this.ctx.save();
     this.ctx.translate(centerX, bottomY);
     this.ctx.rotate(tilt);
 
-    // Neon Glow Underbody
-    this.ctx.shadowBlur = 24;
-    this.ctx.shadowColor = '#00f0ff';
-    this.ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
-    this.ctx.fillRect(-carW * 0.6, -8, carW * 1.2, 22);
+    // Blinking effect if recently damaged
+    if (this.invulnerableTimer > 0 && Math.floor(this.invulnerableTimer * 10) % 2 === 0) {
+      this.ctx.globalAlpha = 0.5;
+    }
 
-    // Cyber Chassis
+    // Chassis
     this.ctx.fillStyle = '#0d071c';
     this.ctx.strokeStyle = '#00f0ff';
     this.ctx.lineWidth = 3;
@@ -1660,24 +1575,22 @@ class NeonRacer {
 
     // Taillights
     this.ctx.fillStyle = '#ff0055';
-    this.ctx.shadowColor = '#ff0055';
-    this.ctx.shadowBlur = 16;
-    this.ctx.fillRect(-carW * 0.4, -4, 20, 6);
-    this.ctx.fillRect(carW * 0.4 - 20, -4, 20, 6);
+    this.ctx.fillRect(-carW * 0.38, -4, 18, 5);
+    this.ctx.fillRect(carW * 0.38 - 18, -4, 18, 5);
 
-    // Nitro Jet Flames
+    // Thruster Jet
     const isBoosting = this.speed > 220;
-    const fLen = isBoosting ? 38 + Math.random() * 22 : 14 + Math.random() * 8;
+    const fLen = isBoosting ? 32 + Math.random() * 18 : 12 + Math.random() * 6;
     const flameGrad = this.ctx.createLinearGradient(0, 8, 0, 8 + fLen);
     flameGrad.addColorStop(0, '#ffffff');
-    flameGrad.addColorStop(0.3, '#00f0ff');
+    flameGrad.addColorStop(0.4, '#00f0ff');
     flameGrad.addColorStop(1, 'rgba(255, 0, 119, 0)');
 
     this.ctx.fillStyle = flameGrad;
     this.ctx.beginPath();
-    this.ctx.moveTo(-14, 10);
+    this.ctx.moveTo(-12, 10);
     this.ctx.lineTo(0, 10 + fLen);
-    this.ctx.lineTo(14, 10);
+    this.ctx.lineTo(12, 10);
     this.ctx.closePath();
     this.ctx.fill();
 
@@ -1686,7 +1599,7 @@ class NeonRacer {
 
   loop(timestamp) {
     if (!this.lastTime) this.lastTime = timestamp;
-    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.05); // Strict clamp
+    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.05);
     this.lastTime = timestamp;
 
     this.update(dt);
