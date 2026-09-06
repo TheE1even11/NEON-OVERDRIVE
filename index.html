@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NEON OVERDRIVE // Cyber Typing Racer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #05030a;
@@ -14,7 +14,7 @@
       --magenta: #ff0077;
       --yellow: #ffe600;
       --purple: #8b00ff;
-      --dark-purple: #1a0826;
+      --dark-card: rgba(14, 8, 28, 0.88);
       --white: #f5f5ff;
       --font-display: 'Orbitron', -apple-system, sans-serif;
       --font-mono: 'Share Tech Mono', monospace;
@@ -26,6 +26,7 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
       touch-action: manipulation;
     }
 
@@ -70,17 +71,17 @@
       pointer-events: none;
       z-index: 10;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
       background-size: 100% 3px, 6px 100%;
     }
 
-    /* HUD Layer */
+    /* In-Game HUD */
     #hud {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 16px 24px;
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -89,24 +90,23 @@
     }
 
     .hud-panel {
-      background: rgba(10, 4, 20, 0.75);
+      background: rgba(10, 4, 22, 0.75);
       border: 1px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 10px rgba(0, 240, 255, 0.1);
-      padding: 10px 18px;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.15);
+      padding: 8px 14px;
       border-radius: 6px;
       backdrop-filter: blur(4px);
     }
 
     .hud-label {
-      font-size: 10px;
+      font-size: 9px;
       letter-spacing: 2px;
       color: var(--cyan);
       text-transform: uppercase;
-      margin-bottom: 2px;
     }
 
     .hud-value {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 900;
       letter-spacing: 1px;
       color: var(--white);
@@ -115,20 +115,20 @@
 
     .hud-sub {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       color: var(--yellow);
     }
 
-    /* Health / Shield Bar */
     .hull-bar-container {
-      width: 140px;
-      height: 10px;
+      width: 120px;
+      height: 8px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 0, 119, 0.5);
-      margin-top: 6px;
+      margin-top: 5px;
       border-radius: 3px;
       overflow: hidden;
     }
+
     #hull-fill {
       width: 100%;
       height: 100%;
@@ -137,63 +137,63 @@
       box-shadow: 0 0 8px var(--magenta);
     }
 
-    /* Target Reticle Floating Tracker */
+    /* Floating Word Target Reticle */
     #target-display {
       position: absolute;
-      bottom: 210px;
+      bottom: 230px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 5;
+      z-index: 6;
       pointer-events: none;
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: transform 0.1s ease-out;
     }
 
     .target-word-box {
       font-family: var(--font-mono);
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
-      letter-spacing: 4px;
-      background: rgba(5, 3, 10, 0.85);
+      letter-spacing: 3px;
+      background: rgba(5, 3, 12, 0.9);
       border: 2px solid var(--cyan);
       border-radius: 8px;
-      padding: 8px 24px;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 15px rgba(0, 240, 255, 0.2);
+      padding: 6px 20px;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
       display: flex;
+      white-space: nowrap;
     }
 
     .char-typed {
       color: var(--yellow);
-      text-shadow: 0 0 10px var(--yellow), 0 0 20px var(--magenta);
+      text-shadow: 0 0 8px var(--yellow), 0 0 16px var(--magenta);
     }
     .char-current {
       color: var(--white);
       text-decoration: underline;
-      animation: pulse-char 0.4s infinite alternate;
+      animation: pulse-char 0.35s infinite alternate;
     }
     .char-remaining {
       color: rgba(255, 255, 255, 0.45);
     }
 
     @keyframes pulse-char {
-      from { color: #ffffff; text-shadow: 0 0 4px #fff; }
+      from { color: #fff; text-shadow: 0 0 4px #fff; }
       to { color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
     }
 
     /* Virtual Touch Keyboard for Mobile */
     #virtual-keyboard {
       position: absolute;
-      bottom: 10px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 620px;
-      padding: 6px;
+      max-width: 580px;
+      padding: 4px 8px;
       display: none;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       z-index: 8;
       pointer-events: auto;
     }
@@ -201,15 +201,15 @@
     .v-row {
       display: flex;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
       width: 100%;
     }
 
     .v-key {
       flex: 1;
       height: 44px;
-      max-width: 52px;
-      background: rgba(20, 10, 35, 0.85);
+      max-width: 48px;
+      background: rgba(22, 12, 40, 0.88);
       border: 1px solid rgba(0, 240, 255, 0.35);
       border-radius: 6px;
       color: var(--white);
@@ -221,123 +221,135 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 3px 0 rgba(0, 240, 255, 0.2);
-      transition: all 0.05s ease;
     }
 
     .v-key:active, .v-key.active {
       transform: translateY(2px);
       background: var(--cyan);
       color: #000;
-      box-shadow: 0 0 15px var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
     }
 
-    .v-key.v-key-wide {
-      flex: 1.5;
-      font-size: 12px;
+    .v-key-wide {
+      flex: 1.4;
+      font-size: 11px;
     }
 
-    /* Overlays & Modals */
+    /* Modal Screens */
     .screen-modal {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(5, 3, 10, 0.88);
-      backdrop-filter: blur(8px);
+      background: rgba(6, 3, 14, 0.9);
+      backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 20;
-      padding: 20px;
+      z-index: 25;
+      padding: 16px;
       text-align: center;
       opacity: 1;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.2s ease;
     }
 
     .screen-modal.hidden {
       opacity: 0;
       pointer-events: none;
-      display: none;
+      display: none !important;
     }
 
     .title-glitch {
-      font-size: clamp(28px, 6vw, 64px);
+      font-size: clamp(26px, 6vw, 54px);
       font-weight: 900;
-      letter-spacing: 6px;
+      letter-spacing: 4px;
       background: linear-gradient(180deg, #fff 0%, var(--cyan) 60%, var(--magenta) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
-      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+      margin-bottom: 4px;
     }
 
     .subtitle {
       font-family: var(--font-mono);
-      font-size: clamp(12px, 2.5vw, 16px);
+      font-size: clamp(11px, 2.2vw, 14px);
       color: var(--yellow);
-      letter-spacing: 4px;
-      margin-bottom: 28px;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+      max-width: 500px;
     }
 
     .neon-button {
-      background: transparent;
+      background: rgba(8, 4, 18, 0.7);
       border: 2px solid var(--cyan);
       color: var(--cyan);
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 700;
-      padding: 14px 40px;
-      letter-spacing: 3px;
+      padding: 12px 26px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      border-radius: 4px;
+      border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
       transition: all 0.15s ease;
-      position: relative;
-      margin: 8px;
-      outline: none;
     }
 
-    .neon-button:hover, .neon-button:focus {
+    .neon-button:hover, .neon-button:active {
       background: var(--cyan);
-      color: var(--bg);
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
-      transform: scale(1.04);
-    }
-
-    .neon-button:active {
-      transform: scale(0.98);
+      color: #05030a;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+      transform: scale(1.03);
     }
 
     .neon-button-mag {
       border-color: var(--magenta);
       color: var(--magenta);
-      box-shadow: 0 0 15px rgba(255, 0, 119, 0.3), inset 0 0 10px rgba(255, 0, 119, 0.2);
+      box-shadow: 0 0 12px rgba(255, 0, 119, 0.3);
     }
-    .neon-button-mag:hover {
+    .neon-button-mag:hover, .neon-button-mag:active {
       background: var(--magenta);
-      color: var(--white);
-      box-shadow: 0 0 30px rgba(255, 0, 119, 0.8);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(255, 0, 119, 0.8);
+    }
+
+    .neon-button-yel {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      box-shadow: 0 0 12px rgba(255, 230, 0, 0.3);
+    }
+    .neon-button-yel:hover, .neon-button-yel:active {
+      background: var(--yellow);
+      color: #05030a;
+      box-shadow: 0 0 25px rgba(255, 230, 0, 0.8);
     }
 
     .leaderboard-box {
       width: 100%;
       max-width: 440px;
-      background: rgba(15, 7, 28, 0.85);
+      background: var(--dark-card);
       border: 1px solid rgba(255, 230, 0, 0.3);
       border-radius: 8px;
-      padding: 16px 20px;
-      margin: 20px 0;
+      padding: 12px 16px;
+      margin: 14px 0;
       font-family: var(--font-mono);
     }
 
     .leaderboard-title {
-      font-size: 14px;
-      letter-spacing: 3px;
+      font-size: 13px;
+      letter-spacing: 2px;
       color: var(--yellow);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-align: center;
       text-transform: uppercase;
     }
@@ -345,68 +357,97 @@
     .score-row {
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 5px 0;
       border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-      font-size: 14px;
+      font-size: 13px;
     }
     .score-row.highlight {
       color: var(--cyan);
       font-weight: bold;
       text-shadow: 0 0 8px var(--cyan);
     }
+    .no-score-text {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      text-align: center;
+      padding: 10px 0;
+    }
 
     .instructions-card {
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 1.6;
-      color: rgba(255, 255, 255, 0.8);
-      max-width: 480px;
-      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.88);
+      max-width: 460px;
+      text-align: left;
       background: rgba(255, 255, 255, 0.04);
-      padding: 12px 18px;
-      border-radius: 6px;
-      border-left: 3px solid var(--cyan);
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-left: 4px solid var(--cyan);
+      margin-bottom: 15px;
     }
 
-    /* Pause icon button */
     #pause-btn {
       pointer-events: auto;
       cursor: pointer;
-      background: rgba(10, 4, 20, 0.6);
+      background: rgba(10, 4, 22, 0.6);
       border: 1px solid var(--cyan);
       color: var(--cyan);
-      padding: 6px 14px;
+      padding: 4px 10px;
       border-radius: 4px;
       font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 1px;
+      font-size: 11px;
     }
 
-    /* Responsive adjustments */
+    /* Mobile Responsive Optimizations */
     @media (max-width: 768px) {
       #hud {
-        padding: 10px;
+        padding: 8px;
       }
       .hud-panel {
-        padding: 6px 10px;
+        padding: 5px 8px;
       }
       .hud-value {
-        font-size: 18px;
+        font-size: 16px;
+      }
+      .hull-bar-container {
+        width: 80px;
+      }
+      #virtual-keyboard {
+        display: flex;
       }
       #target-display {
         bottom: 180px;
       }
       .target-word-box {
-        font-size: 20px;
-        letter-spacing: 2px;
-        padding: 6px 16px;
-      }
-      #virtual-keyboard {
-        display: flex;
+        font-size: 19px;
+        padding: 5px 14px;
       }
     }
 
-    /* Hidden native input for mobile IME support fallback */
+    @media (max-height: 520px) {
+      #target-display {
+        bottom: 140px;
+      }
+      .title-glitch {
+        font-size: 24px;
+        margin-bottom: 0;
+      }
+      .subtitle {
+        margin-bottom: 10px;
+      }
+      .instructions-card {
+        font-size: 11px;
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+      .v-key {
+        height: 34px;
+        font-size: 12px;
+      }
+    }
+
+    /* Invisible Input for Native Mobile Keyboard Support */
     #hidden-input {
       position: absolute;
       opacity: 0;
@@ -422,12 +463,12 @@
   <canvas id="race-canvas"></canvas>
   <div class="scanlines"></div>
 
-  <!-- HUD Overlay -->
+  <!-- HUD Top Bar -->
   <div id="hud">
     <div class="hud-panel">
-      <div class="hud-label">VELOCITY</div>
-      <div class="hud-value" id="hud-speed">0 <span style="font-size:12px">KM/H</span></div>
-      <div class="hud-sub" id="hud-gear">GEAR 1 // BOOST x1.0</div>
+      <div class="hud-label">SPEED</div>
+      <div class="hud-value" id="hud-speed">0 <span style="font-size:10px">KM/H</span></div>
+      <div class="hud-sub" id="hud-gear">NITRO x1.0</div>
     </div>
 
     <div class="hud-panel" style="text-align: center;">
@@ -435,25 +476,25 @@
       <div class="hull-bar-container">
         <div id="hull-fill"></div>
       </div>
-      <div class="hud-sub" id="hud-hull-pct" style="margin-top: 4px;">100%</div>
+      <div class="hud-sub" id="hud-hull-pct" style="margin-top: 3px;">100%</div>
     </div>
 
     <div class="hud-panel" style="text-align: right;">
-      <div class="hud-label">DATA SCORE</div>
+      <div class="hud-label">SCORE</div>
       <div class="hud-value" id="hud-score">000000</div>
-      <div class="hud-sub" id="hud-wpm">0 WPM | 100% ACC</div>
-      <button id="pause-btn" style="margin-top: 6px;">[ESC] PAUSE</button>
+      <div class="hud-sub" id="hud-wpm">0 WPM</div>
+      <button id="pause-btn" style="margin-top: 4px;">PAUSE ⏸</button>
     </div>
   </div>
 
-  <!-- Floating Active Word Reticle -->
+  <!-- Floating Active Word Target Display -->
   <div id="target-display">
     <div class="target-word-box" id="target-word-box">
       <span class="char-remaining">READY...</span>
     </div>
   </div>
 
-  <!-- Mobile On-Screen Cyber Keyboard -->
+  <!-- Mobile On-Screen Virtual Keyboard -->
   <div id="virtual-keyboard">
     <div class="v-row">
       <div class="v-key" data-key="q">Q</div>
@@ -491,61 +532,73 @@
     </div>
   </div>
 
-  <!-- Hidden input for mobile keyboard binding -->
   <input type="text" id="hidden-input" autocomplete="off" autocapitalize="none" spellcheck="false" />
 
-  <!-- Start Screen Modal -->
+  <!-- 1. MAIN MENU SCREEN -->
   <div id="start-modal" class="screen-modal">
     <h1 class="title-glitch">NEON OVERDRIVE</h1>
-    <p class="subtitle">// SYNTH CYBERSPACE TYPING RACER //</p>
+    <p class="subtitle">// CYBER TYPING RACER //</p>
 
-    <div class="instructions-card">
-      &gt; Type the code-phrases hovering over rival drone cars.<br>
-      &gt; Each locked word fires Nitro Thrusters & accelerates velocity.<br>
-      &gt; Avoid letting rival drones collide with your hull.<br>
-      &gt; Chain words without errors to fuel Multiplier Overdrive!
-    </div>
-
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <div class="button-group">
       <button class="neon-button" id="start-btn">ENGAGE [SPACE]</button>
+      <button class="neon-button neon-button-yel" id="how-to-play-btn-menu">HOW TO PLAY</button>
     </div>
 
     <div class="leaderboard-box">
-      <div class="leaderboard-title">HALL OF CYBER-RACERS</div>
+      <div class="leaderboard-title">PERSONAL BEST RECORDS</div>
       <div id="start-leaderboard-list"></div>
     </div>
   </div>
 
-  <!-- Pause Screen Modal -->
+  <!-- 2. PAUSE MENU SCREEN -->
   <div id="pause-modal" class="screen-modal hidden">
-    <h2 class="title-glitch" style="font-size: 38px;">SYSTEM PAUSED</h2>
-    <p class="subtitle">SYNCHRONIZATION FROZEN</p>
-    <div style="display: flex; flex-direction: column; width: 240px;">
-      <button class="neon-button" id="resume-btn">RESUME [ESC]</button>
-      <button class="neon-button neon-button-mag" id="pause-restart-btn">REBOOT [R]</button>
+    <h2 class="title-glitch" style="font-size: 36px;">SYSTEM PAUSED</h2>
+    <p class="subtitle">RACE TEMPORARILY FROZEN</p>
+    <div class="button-group" style="flex-direction: column; width: 240px;">
+      <button class="neon-button" id="resume-btn">RESUME</button>
+      <button class="neon-button neon-button-yel" id="how-to-play-btn-pause">HOW TO PLAY</button>
+      <button class="neon-button" id="pause-restart-btn">RESTART</button>
+      <button class="neon-button neon-button-mag" id="pause-main-menu-btn">MAIN MENU</button>
     </div>
   </div>
 
-  <!-- Game Over Screen Modal -->
+  <!-- 3. HOW TO PLAY MODAL SCREEN -->
+  <div id="how-to-play-modal" class="screen-modal hidden" style="z-index: 30;">
+    <h2 class="title-glitch" style="font-size: 32px; color: var(--yellow);">HOW TO PLAY</h2>
+    <p class="subtitle">CYBER HIGHWAY SURVIVAL GUIDE</p>
+
+    <div class="instructions-card">
+      ⚡ <b>TARGET:</b> Type the words hovering over rival cyber drones using your keyboard or touch screen.<br><br>
+      🚀 <b>OVERDRIVE NITRO:</b> Every completed word fires nitro thrusters, surging your velocity and multiplier.<br><br>
+      💥 <b>COLLISIONS:</b> Missed drones will overtake and ram into your craft, compromising hull integrity.<br><br>
+      🎯 <b>STREAK COMBO:</b> Chain flawless words without errors to boost your score multiplier up to <b>x4.0</b>!<br><br>
+      📱 <b>MOBILE:</b> Tap on-screen cyber keys or tap the screen to bring up your device's native keyboard.
+    </div>
+
+    <button class="neon-button" id="close-how-to-play-btn">GOT IT / CLOSE</button>
+  </div>
+
+  <!-- 4. GAME OVER SCREEN -->
   <div id="gameover-modal" class="screen-modal hidden">
-    <h2 class="title-glitch" style="font-size: 44px; color: var(--magenta);">TERMINATION</h2>
-    <p class="subtitle" id="gameover-reason">HULL COMPROMISED // CRITICAL IMPACT</p>
+    <h2 class="title-glitch" style="font-size: 38px; color: var(--magenta);">MISSION FAILED</h2>
+    <p class="subtitle" id="gameover-reason">HULL INTEGRITY COMPROMISED</p>
 
     <div class="leaderboard-box">
       <div class="score-row"><span>FINAL SCORE</span><span id="final-score" style="color:var(--yellow); font-weight:bold;">0</span></div>
-      <div class="score-row"><span>PEAK VELOCITY</span><span id="final-speed">0 KM/H</span></div>
-      <div class="score-row"><span>AVERAGE SPEED</span><span id="final-wpm">0 WPM</span></div>
-      <div class="score-row"><span>PRECISION ACCURACY</span><span id="final-acc">0%</span></div>
+      <div class="score-row"><span>TOP SPEED</span><span id="final-speed">0 KM/H</span></div>
+      <div class="score-row"><span>TYPING SPEED</span><span id="final-wpm">0 WPM</span></div>
+      <div class="score-row"><span>ACCURACY</span><span id="final-acc">0%</span></div>
       <div class="score-row"><span>DRONES OVERTAKEN</span><span id="final-words">0</span></div>
     </div>
 
     <div class="leaderboard-box">
-      <div class="leaderboard-title">UPDATED RANKINGS</div>
+      <div class="leaderboard-title">UPDATED LEADERBOARD</div>
       <div id="gameover-leaderboard-list"></div>
     </div>
 
-    <div>
-      <button class="neon-button" id="restart-btn">QUICK RESTART [R]</button>
+    <div class="button-group">
+      <button class="neon-button" id="restart-btn">RETRY [R]</button>
+      <button class="neon-button neon-button-mag" id="gameover-main-menu-btn">MAIN MENU</button>
     </div>
   </div>
 
@@ -553,144 +606,136 @@
 
 <script>
 /**
- * NEON OVERDRIVE - Complete Audio, Particle, & Game Engine
+ * NEON OVERDRIVE - Cyberpunk Synthwave Typing Engine
  */
 
 // ==========================================
-// 1. SYNTHESIZED WEB AUDIO ENGINE (ZERO ASSETS NEEDED)
+// 1. SYNTHESIZED WEB AUDIO ENGINE (MOBILE SAFE)
 // ==========================================
 class SoundEngine {
   constructor() {
     this.ctx = null;
-    this.muted = false;
+    this.unlocked = false;
   }
 
-  init() {
+  unlock() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
+      if (AudioCtx) this.ctx = new AudioCtx();
     }
-    if (this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
+    this.unlocked = true;
   }
 
   playKeypress(pitchMod = 1) {
-    if (this.muted || !this.ctx) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const now = this.ctx.currentTime;
-
-    osc.type = 'triangle';
-    // Pentatonic scale note based on mod
-    const baseFreq = 523.25; // C5
-    osc.frequency.setValueAtTime(baseFreq * pitchMod, now);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * pitchMod * 1.5, now + 0.04);
-
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.05);
-  }
-
-  playWordComplete() {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-
-    // Dual synth blast chord
-    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+    if (!this.unlocked || !this.ctx) return;
+    try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+      const now = this.ctx.currentTime;
 
-      gain.gain.setValueAtTime(0.07, now + idx * 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.type = 'triangle';
+      const baseFreq = 523.25; // C5
+      osc.frequency.setValueAtTime(baseFreq * pitchMod, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * pitchMod * 1.4, now + 0.04);
+
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } catch(e) {}
+  }
 
-      osc.start(now + idx * 0.03);
-      osc.stop(now + 0.32);
-    });
+  playWordComplete() {
+    if (!this.unlocked || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.03);
+
+        gain.gain.setValueAtTime(0.07, now + idx * 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.03);
+        osc.stop(now + 0.3);
+      });
+    } catch(e) {}
   }
 
   playTypo() {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
+    if (!this.unlocked || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(140, now);
-    osc.frequency.linearRampToValueAtTime(70, now + 0.12);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.linearRampToValueAtTime(70, now + 0.12);
 
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch(e) {}
   }
 
   playImpact() {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
+    if (!this.unlocked || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
 
-    // Low rumble boom
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(80, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch(e) {}
   }
 }
 
 const audio = new SoundEngine();
 
 // ==========================================
-// 2. WORD POOL & DICTIONARY
+// 2. ENGLISH WORD POOLS (PROGRESSIVE DIFFICULTY)
 // ==========================================
-const WORDS_TIER_1 = [
-  "neon", "grid", "hack", "flow", "rush", "warp", "wave", "sync", "byte", "core",
-  "fast", "over", "gear", "race", "beam", "volt", "zero", "apex", "dash", "slip",
-  "zoom", "fire", "fuel", "jump", "link", "port", "disk", "node", "wire", "chip"
+const WORDS_EASY = [
+  "neon", "grid", "data", "flux", "code", "warp", "byte", "core", "flow", "link",
+  "node", "beam", "dash", "volt", "gear", "apex", "pulse", "fuel", "fast", "hack"
 ];
-
-const WORDS_TIER_2 = [
-  "matrix", "vector", "stream", "cyber", "plasma", "turbos", "driver", "engine",
-  "octane", "hyper", "boost", "thrust", "switch", "binary", "system", "neural",
-  "shield", "tracer", "rocket", "signal", "photon", "glitch", "arcade", "dynamo"
+const WORDS_MEDIUM = [
+  "matrix", "vector", "stream", "cyber", "plasma", "turbos", "engine", "octane",
+  "thrust", "switch", "binary", "neural", "shield", "tracer", "rocket", "signal"
 ];
-
-const WORDS_TIER_3 = [
+const WORDS_HARD = [
   "overdrive", "slipstream", "supercharge", "accelerate", "cybernetics",
-  "subroutine", "afterburner", "tachyonburst", "wavelength", "mainframe",
-  "interceptor", "transmission", "retrothruster", "combustion", "velocity"
+  "subroutine", "afterburner", "tachyonburst", "interceptor", "combustion"
 ];
 
 // ==========================================
-// 3. PERSPECTIVE ROAD & VEHICLE CONSTANTS
+// 3. ROAD LANES & ENTITIES
 // ==========================================
-const ROAD_LANES = [-1.4, 0, 1.4]; // X offsets in 3D world space
-const CAMERA_HEIGHT = 1000;
-const CAMERA_DEPTH = 0.8;
-const ROAD_SEGMENT_LENGTH = 200;
-const ROAD_TOTAL_LENGTH = 16000;
+const ROAD_LANES = [-1.4, 0, 1.4];
 
 class Particle {
   constructor(x, y, vx, vy, color, size, life) {
@@ -703,19 +748,17 @@ class Particle {
     this.maxLife = life;
     this.life = life;
   }
-
   update(dt) {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.life -= dt;
   }
-
   draw(ctx) {
     const alpha = Math.max(0, this.life / this.maxLife);
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = this.color;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -730,30 +773,27 @@ class FloatingText {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.life = 0.8;
-    this.maxLife = 0.8;
+    this.life = 0.85;
+    this.maxLife = 0.85;
   }
-
   update(dt) {
     this.y -= 45 * dt;
     this.life -= dt;
   }
-
   draw(ctx) {
     const alpha = Math.max(0, this.life / this.maxLife);
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = this.color;
-    ctx.font = '900 20px "Orbitron", sans-serif';
+    ctx.font = '900 18px "Orbitron", sans-serif';
     ctx.textAlign = 'center';
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
     ctx.shadowColor = this.color;
     ctx.fillText(this.text, this.x, this.y);
     ctx.restore();
   }
 }
 
-// Rival drone car class
 class RivalDrone {
   constructor(z, laneIdx, word) {
     this.z = z;
@@ -761,11 +801,10 @@ class RivalDrone {
     this.x = ROAD_LANES[laneIdx];
     this.word = word;
     this.typedChars = 0;
-    this.speed = 140; // Base speed relative to world
+    this.speed = 130;
     this.defeated = false;
     this.color = ['#ff0077', '#00f0ff', '#ffe600', '#a855f7'][Math.floor(Math.random() * 4)];
   }
-
   update(dt) {
     this.z += this.speed * dt;
   }
@@ -779,80 +818,73 @@ class NeonRacer {
     this.canvas = document.getElementById('race-canvas');
     this.ctx = this.canvas.getContext('2d');
 
-    // State
     this.state = 'START'; // START, PLAYING, PAUSED, GAMEOVER
+    this.previousState = 'START';
     this.lastTime = 0;
 
     // Player Stats
-    this.playerX = 0; // -1 to 1 lane sway
+    this.playerX = 0;
     this.targetPlayerX = 0;
-    this.playerZ = 0; // position along road
-    this.speed = 160; // KM/H
-    this.baseSpeed = 160;
+    this.playerZ = 0;
+    this.speed = 150;
+    this.baseSpeed = 150;
     this.maxSpeed = 380;
     this.hull = 100;
     this.score = 0;
     this.multiplier = 1.0;
     this.streak = 0;
 
-    // Typing Metrics
+    // Metrics
     this.keystrokes = 0;
     this.correctKeystrokes = 0;
     this.wordsTypedCount = 0;
     this.startTime = 0;
 
-    // Active targeting
+    // Objects
     this.drones = [];
     this.activeDrone = null;
-    this.nextSpawnZ = 1200;
-
-    // Visual Polish
+    this.nextSpawnZ = 1000;
     this.shake = 0;
     this.particles = [];
     this.floatingTexts = [];
-    this.gridOffset = 0;
-    this.sunScanlines = 0;
 
-    // High Scores
+    // Real Player High Scores (Starts completely empty)
     this.highScores = this.loadScores();
 
-    this.bindEvents();
     this.resize();
+    this.bindEvents();
     this.updateLeaderboardsUI();
-    
-    // Start game loop
+
     requestAnimationFrame((t) => this.loop(t));
   }
 
   loadScores() {
     try {
-      const data = localStorage.getItem('neon_overdrive_scores');
-      return data ? JSON.parse(data) : [
-        { score: 45000, wpm: 78, date: 'CYBER-PRO' },
-        { score: 32000, wpm: 64, date: 'SYNTH-RUNNER' },
-        { score: 21000, wpm: 52, date: 'GRID-RACER' },
-        { score: 14000, wpm: 40, date: 'NOVICE-PILOT' },
-        { score: 8000,  wpm: 32, date: 'RECRUIT' }
-      ];
+      const data = localStorage.getItem('neon_overdrive_user_scores');
+      return data ? JSON.parse(data) : [];
     } catch(e) {
-      return [{ score: 20000, wpm: 50, date: 'RACER' }];
+      return [];
     }
   }
 
-  saveScores(newEntry) {
-    this.highScores.push(newEntry);
+  saveScore(newScore) {
+    this.highScores.push(newScore);
     this.highScores.sort((a, b) => b.score - a.score);
-    this.highScores = this.highScores.slice(0, 5);
+    this.highScores = this.highScores.slice(0, 5); // Keep top 5
     try {
-      localStorage.setItem('neon_overdrive_scores', JSON.stringify(this.highScores));
+      localStorage.setItem('neon_overdrive_user_scores', JSON.stringify(this.highScores));
     } catch(e) {}
     this.updateLeaderboardsUI();
   }
 
   updateLeaderboardsUI() {
-    const renderList = (elementId) => {
+    const render = (elementId) => {
       const el = document.getElementById(elementId);
       if (!el) return;
+      if (this.highScores.length === 0) {
+        el.innerHTML = `<div class="no-score-text">NO RECORDED SCORES YET<br>SET YOUR FIRST RECORD!</div>`;
+        return;
+      }
       el.innerHTML = this.highScores.map((item, idx) => `
         <div class="score-row ${item.current ? 'highlight' : ''}">
           <span>#${idx+1} ${item.date}</span>
@@ -861,8 +893,8 @@ class NeonRacer {
       `).join('');
     };
 
-    renderList('start-leaderboard-list');
-    renderList('gameover-leaderboard-list');
+    render('start-leaderboard-list');
+    render('gameover-leaderboard-list');
   }
 
   resize() {
@@ -871,17 +903,27 @@ class NeonRacer {
     this.height = window.innerHeight;
     this.canvas.width = this.width * dpr;
     this.canvas.height = this.height * dpr;
-    this.ctx.scale(dpr, dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   bindEvents() {
     window.addEventListener('resize', () => this.resize());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 150));
 
-    // Keyboard controls
+    const unlockAudio = () => audio.unlock();
+    window.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
+    window.addEventListener('mousedown', unlockAudio, { once: true });
+
+    // Keyboard Listener
     window.addEventListener('keydown', (e) => {
-      audio.init();
+      audio.unlock();
 
       if (e.key === 'Escape') {
+        const howToPlayModal = document.getElementById('how-to-play-modal');
+        if (!howToPlayModal.classList.contains('hidden')) {
+          this.closeHowToPlay();
+          return;
+        }
         if (this.state === 'PLAYING') this.pauseGame();
         else if (this.state === 'PAUSED') this.resumeGame();
         return;
@@ -899,32 +941,37 @@ class NeonRacer {
         return;
       }
 
+      // Process input only while active and in-game
       if (this.state === 'PLAYING') {
-        // Prevent default space navigation
         if (e.key === ' ') e.preventDefault();
-        this.handleTypingInput(e.key);
+        this.handleInput(e.key);
       }
     });
 
-    // Mobile Virtual Keyboard Handling
+    // Mobile Virtual Touch Keys
     const vKeys = document.querySelectorAll('.v-key');
-    vKeys.forEach(key => {
-      key.addEventListener('pointerdown', (ev) => {
+    vKeys.forEach(k => {
+      k.addEventListener('pointerdown', (ev) => {
         ev.preventDefault();
-        audio.init();
-        const k = key.getAttribute('data-key');
-        key.classList.add('active');
-        setTimeout(() => key.classList.remove('active'), 100);
+        audio.unlock();
+        const keyVal = k.getAttribute('data-key');
+        k.classList.add('active');
+        setTimeout(() => k.classList.remove('active'), 100);
+
+        if (keyVal === 'Escape') {
+          if (this.state === 'PLAYING') this.pauseGame();
+          return;
+        }
 
         if (this.state === 'PLAYING') {
-          this.handleTypingInput(k);
+          this.handleInput(keyVal);
         }
       });
     });
 
-    // Modal buttons
+    // Button Bindings
     document.getElementById('start-btn').addEventListener('click', () => {
-      audio.init();
+      audio.unlock();
       this.startGame();
     });
 
@@ -937,34 +984,63 @@ class NeonRacer {
     document.getElementById('pause-restart-btn').addEventListener('click', () => this.startGame());
     document.getElementById('restart-btn').addEventListener('click', () => this.startGame());
 
-    // Window focus / pause
-    window.addEventListener('blur', () => {
-      if (this.state === 'PLAYING') this.pauseGame();
-    });
+    // Main Menu Buttons
+    document.getElementById('pause-main-menu-btn').addEventListener('click', () => this.goToMainMenu());
+    document.getElementById('gameover-main-menu-btn').addEventListener('click', () => this.goToMainMenu());
 
-    // Tap canvas to focus hidden input on mobile
+    // How to Play Buttons
+    document.getElementById('how-to-play-btn-menu').addEventListener('click', () => this.openHowToPlay());
+    document.getElementById('how-to-play-btn-pause').addEventListener('click', () => this.openHowToPlay());
+    document.getElementById('close-how-to-play-btn').addEventListener('click', () => this.closeHowToPlay());
+
+    // Focus Hidden Input on Canvas Tap
     this.canvas.addEventListener('pointerdown', () => {
-      audio.init();
-      const inp = document.getElementById('hidden-input');
-      if (inp) inp.focus();
+      audio.unlock();
+      const hiddenInput = document.getElementById('hidden-input');
+      if (hiddenInput && this.state === 'PLAYING') {
+        hiddenInput.focus();
+      }
     });
 
-    // Hidden input support for mobile native keyboard
     const hiddenInput = document.getElementById('hidden-input');
-    hiddenInput.addEventListener('input', (e) => {
+    hiddenInput.addEventListener('input', () => {
       if (this.state === 'PLAYING' && hiddenInput.value.length > 0) {
         const char = hiddenInput.value.slice(-1);
-        this.handleTypingInput(char);
+        this.handleInput(char);
         hiddenInput.value = '';
       }
     });
   }
 
+  openHowToPlay() {
+    this.previousState = this.state;
+    document.getElementById('how-to-play-modal').classList.remove('hidden');
+  }
+
+  closeHowToPlay() {
+    document.getElementById('how-to-play-modal').classList.add('hidden');
+  }
+
+  goToMainMenu() {
+    this.state = 'START';
+    this.drones = [];
+    this.activeDrone = null;
+    this.highScores.forEach(s => s.current = false);
+    this.updateLeaderboardsUI();
+
+    document.getElementById('pause-modal').classList.add('hidden');
+    document.getElementById('gameover-modal').classList.add('hidden');
+    document.getElementById('how-to-play-modal').classList.add('hidden');
+    document.getElementById('start-modal').classList.remove('hidden');
+
+    document.getElementById('target-word-box').innerHTML = `<span class="char-remaining">READY...</span>`;
+  }
+
   getRandomWord() {
     let pool;
-    if (this.speed < 210) pool = WORDS_TIER_1;
-    else if (this.speed < 300) pool = WORDS_TIER_2;
-    else pool = WORDS_TIER_3;
+    if (this.speed < 200) pool = WORDS_EASY;
+    else if (this.speed < 290) pool = WORDS_MEDIUM;
+    else pool = WORDS_HARD;
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
@@ -987,14 +1063,15 @@ class NeonRacer {
     this.particles = [];
     this.floatingTexts = [];
 
-    // Hide modals
+    // Hide all modals
     document.getElementById('start-modal').classList.add('hidden');
     document.getElementById('pause-modal').classList.add('hidden');
     document.getElementById('gameover-modal').classList.add('hidden');
+    document.getElementById('how-to-play-modal').classList.add('hidden');
 
-    // Spawn initial wave of rivals
+    // Spawn initial rivals
     for (let i = 0; i < 3; i++) {
-      this.spawnRival(1200 + i * 750);
+      this.spawnRival(1100 + i * 700);
     }
 
     this.selectClosestTarget();
@@ -1002,11 +1079,13 @@ class NeonRacer {
   }
 
   pauseGame() {
+    if (this.state !== 'PLAYING') return;
     this.state = 'PAUSED';
     document.getElementById('pause-modal').classList.remove('hidden');
   }
 
   resumeGame() {
+    if (this.state !== 'PAUSED') return;
     this.state = 'PLAYING';
     this.lastTime = performance.now();
     document.getElementById('pause-modal').classList.add('hidden');
@@ -1021,14 +1100,16 @@ class NeonRacer {
     const wpm = Math.round((this.correctKeystrokes / 5) / elapsedMin);
     const acc = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
 
-    // Register new high score
-    const entry = {
+    // Save actual player record
+    this.highScores.forEach(s => s.current = false);
+    const now = new Date();
+    const dateStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    this.saveScore({
       score: Math.floor(this.score),
       wpm: wpm,
-      date: `RUNNER-${Math.floor(100 + Math.random() * 899)}`,
+      date: `RUN (${dateStr})`,
       current: true
-    };
-    this.saveScores(entry);
+    });
 
     document.getElementById('gameover-reason').innerText = reason;
     document.getElementById('final-score').innerText = Math.floor(this.score).toLocaleString();
@@ -1043,27 +1124,23 @@ class NeonRacer {
   spawnRival(zDistance) {
     const lane = Math.floor(Math.random() * 3);
     const word = this.getRandomWord();
-    const drone = new RivalDrone(zDistance, lane, word);
-    this.drones.push(drone);
+    this.drones.push(new RivalDrone(zDistance, lane, word));
   }
 
   selectClosestTarget() {
-    if (this.drones.length === 0) return;
-    // Sort by distance to player (z relative to player)
     const validDrones = this.drones.filter(d => !d.defeated && d.z > this.playerZ);
     if (validDrones.length > 0) {
       validDrones.sort((a, b) => a.z - b.z);
       this.activeDrone = validDrones[0];
-      this.targetPlayerX = this.activeDrone.x * 0.45; // steer smoothly toward target lane
-      this.updateTargetDisplay();
+      this.targetPlayerX = this.activeDrone.x * 0.45;
     } else {
       this.activeDrone = null;
-      this.updateTargetDisplay();
     }
+    this.updateTargetDisplay();
   }
 
-  handleTypingInput(key) {
-    if (!key || key.length !== 1 && key !== 'Backspace') return;
+  handleInput(key) {
+    if (!key || (key.length !== 1 && key !== 'Backspace')) return;
 
     if (key === 'Backspace') {
       if (this.activeDrone && this.activeDrone.typedChars > 0) {
@@ -1076,122 +1153,111 @@ class NeonRacer {
     const inputChar = key.toLowerCase();
     this.keystrokes++;
 
-    // If no active drone or target already passed
+    // Find candidate matching input char if not selected
     if (!this.activeDrone || this.activeDrone.defeated || this.activeDrone.z <= this.playerZ) {
-      // Find any incoming drone that starts with this key
       const match = this.drones.find(d => !d.defeated && d.z > this.playerZ && d.word[0].toLowerCase() === inputChar);
       if (match) {
         this.activeDrone = match;
         this.targetPlayerX = this.activeDrone.x * 0.45;
       } else {
-        this.triggerTypoPenalty();
+        this.triggerTypo();
         return;
       }
     }
 
-    const currentExpectedChar = this.activeDrone.word[this.activeDrone.typedChars].toLowerCase();
+    const expected = this.activeDrone.word[this.activeDrone.typedChars].toLowerCase();
 
-    if (inputChar === currentExpectedChar) {
-      // CORRECT KEYPRESS
+    if (inputChar === expected) {
       this.correctKeystrokes++;
       this.activeDrone.typedChars++;
       this.streak++;
-      this.multiplier = Math.min(4.0, 1.0 + Math.floor(this.streak / 6) * 0.5);
+      this.multiplier = Math.min(4.0, 1.0 + Math.floor(this.streak / 5) * 0.5);
 
-      // Pitch variance based on progress
-      const pitchRatio = 1 + (this.activeDrone.typedChars / this.activeDrone.word.length) * 0.6;
-      audio.playKeypress(pitchRatio);
+      const pitch = 1 + (this.activeDrone.typedChars / this.activeDrone.word.length) * 0.6;
+      audio.playKeypress(pitch);
 
-      // Spawn sparks behind player car
       this.createKeySparks();
 
-      // Check if word completed
       if (this.activeDrone.typedChars >= this.activeDrone.word.length) {
-        this.completeWordOnDrone(this.activeDrone);
+        this.completeWord(this.activeDrone);
       } else {
         this.updateTargetDisplay();
       }
     } else {
-      // TYPO PENALTY
-      this.triggerTypoPenalty();
+      this.triggerTypo();
     }
 
     this.updateHUD();
   }
 
-  triggerTypoPenalty() {
+  triggerTypo() {
     audio.playTypo();
     this.shake = 0.15;
     this.streak = 0;
     this.multiplier = 1.0;
-    this.speed = Math.max(120, this.speed - 20); // Velocity hiccup
+    this.speed = Math.max(110, this.speed - 22);
 
-    const targetBox = document.getElementById('target-word-box');
-    targetBox.style.borderColor = '#ff0055';
-    targetBox.style.boxShadow = '0 0 25px #ff0055';
+    const box = document.getElementById('target-word-box');
+    box.style.borderColor = 'var(--magenta)';
+    box.style.boxShadow = '0 0 25px var(--magenta)';
     setTimeout(() => {
-      targetBox.style.borderColor = 'var(--cyan)';
-      targetBox.style.boxShadow = '0 0 25px rgba(0, 240, 255, 0.4)';
+      box.style.borderColor = 'var(--cyan)';
+      box.style.boxShadow = '0 0 25px rgba(0, 240, 255, 0.45)';
     }, 180);
 
-    this.floatingTexts.push(new FloatingText("MISS!", this.width / 2, this.height / 2 - 80, '#ff0077'));
+    this.floatingTexts.push(new FloatingText("MISS!", this.width / 2, this.height * 0.45, '#ff0077'));
   }
 
-  completeWordOnDrone(drone) {
+  completeWord(drone) {
     drone.defeated = true;
     this.wordsTypedCount++;
     audio.playWordComplete();
 
-    // Boost & Nitro surge
-    this.speed = Math.min(this.maxSpeed, this.speed + 45);
-    const wordBonus = drone.word.length * 150 * this.multiplier;
-    this.score += wordBonus;
+    this.speed = Math.min(this.maxSpeed, this.speed + 40);
+    const bonus = drone.word.length * 150 * this.multiplier;
+    this.score += bonus;
 
-    // Screen Shake & Nitro visual
-    this.shake = 0.35;
-    this.createDroneExplosion(drone);
+    this.shake = 0.3;
+    this.createExplosion(drone);
 
     this.floatingTexts.push(
-      new FloatingText(`+${Math.floor(wordBonus)} OVERDRIVE!`, this.width / 2, this.height / 2 - 100, '#ffe600')
+      new FloatingText(`+${Math.floor(bonus)} OVERDRIVE!`, this.width / 2, this.height * 0.45, '#ffe600')
     );
 
-    // Auto-select next candidate
-    setTimeout(() => {
-      this.selectClosestTarget();
-    }, 50);
+    setTimeout(() => this.selectClosestTarget(), 60);
   }
 
   createKeySparks() {
     const bottomY = this.height * 0.82;
     const centerX = this.width / 2 + this.playerX * 120;
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       this.particles.push(new Particle(
-        centerX + (Math.random() - 0.5) * 40,
+        centerX + (Math.random() - 0.5) * 30,
         bottomY,
-        (Math.random() - 0.5) * 140,
-        (Math.random() * -120) - 40,
+        (Math.random() - 0.5) * 120,
+        -Math.random() * 90 - 40,
         Math.random() > 0.5 ? '#00f0ff' : '#ffe600',
         Math.random() * 3 + 2,
-        0.35
+        0.3
       ));
     }
   }
 
-  createDroneExplosion(drone) {
-    const projected = this.project3D(drone.x, 0, drone.z - this.playerZ);
-    if (!projected) return;
+  createExplosion(drone) {
+    const p = this.project3D(drone.x, 0, drone.z - this.playerZ);
+    if (!p) return;
 
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 35; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 300 + 100;
+      const spd = Math.random() * 260 + 80;
       this.particles.push(new Particle(
-        projected.x,
-        projected.y,
-        Math.cos(angle) * speed,
-        Math.sin(angle) * speed,
-        Math.random() > 0.3 ? drone.color : '#ffffff',
+        p.x,
+        p.y,
+        Math.cos(angle) * spd,
+        Math.sin(angle) * spd,
+        drone.color,
         Math.random() * 4 + 2,
-        0.6
+        0.55
       ));
     }
   }
@@ -1220,29 +1286,24 @@ class NeonRacer {
   }
 
   updateHUD() {
-    document.getElementById('hud-speed').innerHTML = `${Math.floor(this.speed)} <span style="font-size:12px">KM/H</span>`;
-    document.getElementById('hud-gear').innerText = `BOOST x${this.multiplier.toFixed(1)} // STREAK ${this.streak}`;
+    document.getElementById('hud-speed').innerHTML = `${Math.floor(this.speed)} <span style="font-size:10px">KM/H</span>`;
+    document.getElementById('hud-gear').innerText = `NITRO x${this.multiplier.toFixed(1)} // STREAK: ${this.streak}`;
     document.getElementById('hud-score').innerText = Math.floor(this.score).toString().padStart(6, '0');
 
-    // Health
-    const hullFill = document.getElementById('hull-fill');
-    hullFill.style.width = `${Math.max(0, this.hull)}%`;
+    document.getElementById('hull-fill').style.width = `${Math.max(0, this.hull)}%`;
     document.getElementById('hud-hull-pct').innerText = `${Math.max(0, Math.round(this.hull))}%`;
 
-    // Metrics
-    const elapsedMinutes = Math.max(0.01, (performance.now() - this.startTime) / 60000);
-    const currentWPM = Math.round((this.correctKeystrokes / 5) / elapsedMinutes);
-    const accuracy = this.keystrokes > 0 ? Math.round((this.correctKeystrokes / this.keystrokes) * 100) : 100;
-    document.getElementById('hud-wpm').innerText = `${currentWPM} WPM | ${accuracy}% ACC`;
+    const elapsed = Math.max(0.01, (performance.now() - this.startTime) / 60000);
+    const currentWPM = Math.round((this.correctKeystrokes / 5) / elapsed);
+    document.getElementById('hud-wpm').innerText = `${currentWPM} WPM`;
   }
 
-  // Perspective 3D Coordinate Mapping
   project3D(worldX, worldY, worldZ) {
     if (worldZ <= 0) return null;
     const cameraDist = 320;
     const scale = cameraDist / worldZ;
     const centerX = this.width / 2;
-    const centerY = this.height * 0.52; // Horizon line
+    const centerY = this.height * 0.52;
 
     return {
       x: centerX + (worldX * 420 - this.playerX * 180) * scale,
@@ -1251,57 +1312,45 @@ class NeonRacer {
     };
   }
 
-  // ==========================================
-  // 5. UPDATE AND RENDER PIPELINE (60 FPS)
-  // ==========================================
   update(dt) {
     if (this.state !== 'PLAYING') return;
 
-    // Advance player road position
-    const worldStep = this.speed * 8 * dt;
-    this.playerZ += worldStep;
+    this.playerZ += this.speed * 8 * dt;
     this.score += (this.speed * 0.1) * dt;
 
-    // Speed decay towards base speed
     if (this.speed > this.baseSpeed) {
-      this.speed -= 14 * dt;
+      this.speed -= 12 * dt;
     }
 
-    // Smooth camera steering
     this.playerX += (this.targetPlayerX - this.playerX) * 8 * dt;
 
-    // Decay trauma shake
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - 1.5 * dt);
     }
 
-    // Spawn drones ahead
-    if (this.playerZ + 2400 > this.nextSpawnZ) {
+    if (this.playerZ + 2200 > this.nextSpawnZ) {
       this.spawnRival(this.nextSpawnZ + 800);
-      this.nextSpawnZ += 750 + Math.random() * 400;
+      this.nextSpawnZ += 700 + Math.random() * 400;
     }
 
-    // Update Drones and check Collisions
+    // Update drones & handle collision penalties
     for (let i = this.drones.length - 1; i >= 0; i--) {
       const drone = this.drones[i];
       drone.update(dt);
+      const relZ = drone.z - this.playerZ;
 
-      const relativeZ = drone.z - this.playerZ;
-
-      // Drone passed behind player
-      if (relativeZ < -150) {
+      if (relZ < -150) {
         if (!drone.defeated) {
-          // Player hit or was overtaken without typing
-          this.hull -= 28;
+          this.hull -= 26;
           audio.playImpact();
-          this.shake = 0.45;
-          this.multiplier = 1.0;
+          this.shake = 0.4;
           this.streak = 0;
-          this.speed = Math.max(100, this.speed - 50);
-          this.floatingTexts.push(new FloatingText("COLLISION! -28%", this.width / 2, this.height / 2, '#ff0055'));
+          this.multiplier = 1.0;
+          this.speed = Math.max(100, this.speed - 45);
+          this.floatingTexts.push(new FloatingText("IMPACT! -26%", this.width / 2, this.height * 0.5, '#ff0055'));
 
           if (this.hull <= 0) {
-            this.gameOver("HULL BREACHED // COLLISION DETECTED");
+            this.gameOver("CRITICAL COLLISION // HULL BREACHED");
             return;
           }
         }
@@ -1312,18 +1361,15 @@ class NeonRacer {
       }
     }
 
-    // Check if active target has moved behind player
     if (this.activeDrone && (this.activeDrone.z - this.playerZ) <= 0) {
       this.selectClosestTarget();
     }
 
-    // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       this.particles[i].update(dt);
       if (this.particles[i].life <= 0) this.particles.splice(i, 1);
     }
 
-    // Update floating texts
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       this.floatingTexts[i].update(dt);
       if (this.floatingTexts[i].life <= 0) this.floatingTexts.splice(i, 1);
@@ -1336,39 +1382,27 @@ class NeonRacer {
     this.ctx.clearRect(0, 0, this.width, this.height);
 
     this.ctx.save();
-    // Screen shake translation
     if (this.shake > 0) {
-      const shakeMag = this.shake * 18;
-      const ox = (Math.random() - 0.5) * shakeMag;
-      const oy = (Math.random() - 0.5) * shakeMag;
-      this.ctx.translate(ox, oy);
+      const mag = this.shake * 16;
+      this.ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
     }
 
     this.renderSkyAndSun();
-    this.render3DRoad();
-    this.renderRivalDrones();
-    this.renderPlayerVehicle();
+    this.renderRoad();
+    this.renderDrones();
+    this.renderPlayer();
 
-    // Render Particles
-    for (let p of this.particles) {
-      p.draw(this.ctx);
-    }
-
-    // Render Floating Notification Texts
-    for (let ft of this.floatingTexts) {
-      ft.draw(this.ctx);
-    }
+    for (let p of this.particles) p.draw(this.ctx);
+    for (let ft of this.floatingTexts) ft.draw(this.ctx);
 
     this.ctx.restore();
   }
 
   renderSkyAndSun() {
     const horizon = this.height * 0.52;
-
-    // Retro Sun
     const sunRadius = Math.min(this.width, this.height) * 0.16;
-    const sunX = this.width / 2 - (this.playerX * 60);
-    const sunY = horizon - sunRadius * 0.45;
+    const sunX = this.width / 2 - (this.playerX * 50);
+    const sunY = horizon - sunRadius * 0.4;
 
     const sunGrad = this.ctx.createLinearGradient(sunX, sunY - sunRadius, sunX, sunY + sunRadius);
     sunGrad.addColorStop(0, '#ffe600');
@@ -1381,45 +1415,28 @@ class NeonRacer {
     this.ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // Synth horizontal scanlines slicing the sun
+    // Synth scanline slits on sun
     this.ctx.fillStyle = 'rgba(5, 3, 10, 0.9)';
-    const stripeCount = 9;
-    for (let i = 0; i < stripeCount; i++) {
-      const stripeY = sunY + (i / stripeCount) * sunRadius;
-      const stripeHeight = 2 + i * 1.5;
-      this.ctx.fillRect(sunX - sunRadius, stripeY, sunRadius * 2, stripeHeight);
+    const stripes = 8;
+    for (let i = 0; i < stripes; i++) {
+      const sY = sunY + (i / stripes) * sunRadius;
+      this.ctx.fillRect(sunX - sunRadius, sY, sunRadius * 2, 2 + i * 1.5);
     }
-    this.ctx.restore();
-
-    // Distant Neon Grid Skyline Mountain Silhouettes
-    this.ctx.save();
-    this.ctx.fillStyle = '#0f051d';
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, horizon);
-    const segments = 12;
-    for (let i = 0; i <= segments; i++) {
-      const px = (this.width / segments) * i;
-      const py = horizon - ((i % 2 === 0) ? 35 : 15);
-      this.ctx.lineTo(px, py);
-    }
-    this.ctx.lineTo(this.width, horizon);
-    this.ctx.closePath();
-    this.ctx.fill();
     this.ctx.restore();
   }
 
-  render3DRoad() {
+  renderRoad() {
     const horizon = this.height * 0.52;
     const roadBottomW = this.width * 1.35;
     const roadTopW = this.width * 0.05;
     const centerX = this.width / 2 - (this.playerX * 180);
 
-    // Dark Road Surface
     this.ctx.save();
     const roadGrad = this.ctx.createLinearGradient(0, horizon, 0, this.height);
     roadGrad.addColorStop(0, '#0a0316');
     roadGrad.addColorStop(1, '#1b092f');
     this.ctx.fillStyle = roadGrad;
+
     this.ctx.beginPath();
     this.ctx.moveTo(centerX - roadTopW / 2, horizon);
     this.ctx.lineTo(centerX + roadTopW / 2, horizon);
@@ -1428,120 +1445,92 @@ class NeonRacer {
     this.ctx.closePath();
     this.ctx.fill();
 
-    // Road Border Glow Lines
+    // Glowing Road Borders
     this.ctx.strokeStyle = '#00f0ff';
-    this.ctx.lineWidth = 4;
-    this.ctx.shadowBlur = 15;
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowBlur = 12;
     this.ctx.shadowColor = '#00f0ff';
     this.ctx.beginPath();
-    // Left edge
     this.ctx.moveTo(centerX - roadTopW / 2, horizon);
     this.ctx.lineTo(this.width / 2 - roadBottomW / 2, this.height);
-    // Right edge
     this.ctx.moveTo(centerX + roadTopW / 2, horizon);
     this.ctx.lineTo(this.width / 2 + roadBottomW / 2, this.height);
     this.ctx.stroke();
 
-    // Animated Neon Horizontal Ground Grid Bands
-    const totalBands = 20;
+    // Road Grid Bands
     const cycle = (this.playerZ % 300) / 300;
-    for (let i = 0; i < totalBands; i++) {
-      const p = (i + cycle) / totalBands;
+    for (let i = 0; i < 18; i++) {
+      const p = (i + cycle) / 18;
       const y = horizon + Math.pow(p, 2.5) * (this.height - horizon);
       const halfW = (roadTopW / 2) + Math.pow(p, 2.5) * (roadBottomW / 2);
 
-      this.ctx.strokeStyle = `rgba(255, 0, 119, ${0.15 + p * 0.45})`;
+      this.ctx.strokeStyle = `rgba(255, 0, 119, ${0.15 + p * 0.4})`;
       this.ctx.lineWidth = 1 + p * 2;
       this.ctx.beginPath();
       this.ctx.moveTo(centerX - halfW, y);
       this.ctx.lineTo(centerX + halfW, y);
       this.ctx.stroke();
     }
-
-    // Lane Dividers
-    [-0.45, 0.45].forEach(laneOffset => {
-      this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-      this.ctx.moveTo(centerX + (roadTopW * laneOffset), horizon);
-      this.ctx.lineTo(this.width / 2 + (roadBottomW * laneOffset), this.height);
-      this.ctx.stroke();
-    });
-
     this.ctx.restore();
   }
 
-  renderRivalDrones() {
-    // Sort from farthest to nearest for correct painter's depth
+  renderDrones() {
     const sorted = [...this.drones].sort((a, b) => b.z - a.z);
 
     sorted.forEach(drone => {
       const relZ = drone.z - this.playerZ;
-      if (relZ <= 40 || relZ > 2800) return;
+      if (relZ <= 35 || relZ > 2600) return;
 
       const p = this.project3D(drone.x, 0, relZ);
       if (!p) return;
 
       const scale = p.scale;
-      const droneW = 120 * scale;
-      const droneH = 45 * scale;
+      const droneW = 115 * scale;
+      const droneH = 42 * scale;
       const isTarget = (this.activeDrone === drone);
 
       this.ctx.save();
       this.ctx.translate(p.x, p.y);
 
-      // Target Reticle Box around active candidate
+      // Target Box
       if (isTarget && !drone.defeated) {
         this.ctx.strokeStyle = '#00f0ff';
         this.ctx.lineWidth = 2;
-        this.ctx.shadowBlur = 12;
+        this.ctx.shadowBlur = 10;
         this.ctx.shadowColor = '#00f0ff';
-        const boxPad = 25 * scale;
-        this.ctx.strokeRect(-droneW / 2 - boxPad, -droneH - boxPad, droneW + boxPad * 2, droneH + boxPad * 1.5);
+        const pad = 20 * scale;
+        this.ctx.strokeRect(-droneW / 2 - pad, -droneH - pad, droneW + pad * 2, droneH + pad * 1.5);
       }
 
-      // Drone Cybercraft Body
-      this.ctx.fillStyle = drone.defeated ? '#555555' : '#140c26';
-      this.ctx.strokeStyle = drone.defeated ? '#777777' : drone.color;
-      this.ctx.lineWidth = 3 * scale + 1;
-      this.ctx.shadowBlur = drone.defeated ? 0 : 15;
+      // Drone Craft Body
+      this.ctx.fillStyle = drone.defeated ? '#444' : '#140c26';
+      this.ctx.strokeStyle = drone.defeated ? '#666' : drone.color;
+      this.ctx.lineWidth = 2.5 * scale + 1;
+      this.ctx.shadowBlur = drone.defeated ? 0 : 12;
       this.ctx.shadowColor = drone.color;
 
-      // Wedge shape fuselage
       this.ctx.beginPath();
       this.ctx.moveTo(-droneW / 2, -5 * scale);
       this.ctx.lineTo(0, -droneH);
       this.ctx.lineTo(droneW / 2, -5 * scale);
-      this.ctx.lineTo(droneW * 0.35, 0);
-      this.ctx.lineTo(-droneW * 0.35, 0);
+      this.ctx.lineTo(droneW * 0.3, 0);
+      this.ctx.lineTo(-droneW * 0.3, 0);
       this.ctx.closePath();
       this.ctx.fill();
       this.ctx.stroke();
 
-      // Glowing Thruster Exhaust
+      // Word Label
       if (!drone.defeated) {
-        this.ctx.fillStyle = drone.color;
-        this.ctx.beginPath();
-        this.ctx.arc(0, -5 * scale, 8 * scale, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
-
-      // Word Billboard Rendered Over Drone
-      if (!drone.defeated) {
-        const fontSize = Math.max(12, Math.floor(26 * scale));
+        const fontSize = Math.max(12, Math.floor(25 * scale));
         this.ctx.font = `bold ${fontSize}px "Share Tech Mono", monospace`;
         this.ctx.textAlign = 'center';
 
-        const textY = -droneH - 18 * scale;
-        const word = drone.word;
-        const typed = drone.typedChars;
-
-        // Background pill behind word for ultra-high contrast readability
-        const textMetrics = this.ctx.measureText(word);
-        const pillW = textMetrics.width + 16 * scale;
+        const textY = -droneH - 16 * scale;
+        const textMetrics = this.ctx.measureText(drone.word);
+        const pillW = textMetrics.width + 14 * scale;
         const pillH = fontSize + 8 * scale;
 
-        this.ctx.fillStyle = 'rgba(5, 3, 10, 0.85)';
+        this.ctx.fillStyle = 'rgba(5, 3, 12, 0.88)';
         this.ctx.strokeStyle = isTarget ? '#00f0ff' : 'rgba(255,255,255,0.2)';
         this.ctx.lineWidth = 1.5;
         this.ctx.beginPath();
@@ -1549,30 +1538,27 @@ class NeonRacer {
         this.ctx.fill();
         this.ctx.stroke();
 
-        // Render matched letters in Gold, pending in Crisp White
-        const fullWordWidth = textMetrics.width;
-        let startCharX = -fullWordWidth / 2;
+        let startX = -textMetrics.width / 2;
+        for (let i = 0; i < drone.word.length; i++) {
+          const ch = drone.word[i];
+          const chW = this.ctx.measureText(ch).width;
+          const chCenterX = startX + chW / 2;
 
-        for (let i = 0; i < word.length; i++) {
-          const char = word[i];
-          const charWidth = this.ctx.measureText(char).width;
-          const charCenterX = startCharX + charWidth / 2;
-
-          if (i < typed) {
+          if (i < drone.typedChars) {
             this.ctx.fillStyle = '#ffe600';
-            this.ctx.shadowBlur = 10;
+            this.ctx.shadowBlur = 8;
             this.ctx.shadowColor = '#ffe600';
-          } else if (i === typed && isTarget) {
+          } else if (i === drone.typedChars && isTarget) {
             this.ctx.fillStyle = '#ffffff';
-            this.ctx.shadowBlur = 12;
+            this.ctx.shadowBlur = 10;
             this.ctx.shadowColor = '#00f0ff';
           } else {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
             this.ctx.shadowBlur = 0;
           }
 
-          this.ctx.fillText(char, charCenterX, textY);
-          startCharX += charWidth;
+          this.ctx.fillText(ch, chCenterX, textY);
+          startX += chW;
         }
       }
 
@@ -1580,74 +1566,71 @@ class NeonRacer {
     });
   }
 
-  renderPlayerVehicle() {
+  renderPlayer() {
     const bottomY = this.height * 0.86;
     const centerX = this.width / 2 + (this.playerX * 120);
-    const tilt = (this.targetPlayerX - this.playerX) * 0.6; // Banking turn tilt
+    const tilt = (this.targetPlayerX - this.playerX) * 0.55;
 
-    const carW = 120;
-    const carH = 50;
+    const carW = 110;
+    const carH = 46;
 
     this.ctx.save();
     this.ctx.translate(centerX, bottomY);
     this.ctx.rotate(tilt);
 
-    // Underglow Neon Shadow
-    this.ctx.shadowBlur = 30;
+    // Neon Glow Underbody
+    this.ctx.shadowBlur = 24;
     this.ctx.shadowColor = '#00f0ff';
     this.ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
-    this.ctx.fillRect(-carW * 0.6, -10, carW * 1.2, 25);
+    this.ctx.fillRect(-carW * 0.6, -8, carW * 1.2, 22);
 
-    // Aerodynamic Cyber Chassis
+    // Cyber Chassis
     this.ctx.fillStyle = '#0d071c';
     this.ctx.strokeStyle = '#00f0ff';
     this.ctx.lineWidth = 3;
 
     this.ctx.beginPath();
-    this.ctx.moveTo(-carW / 2, 10);
-    this.ctx.lineTo(-carW * 0.38, -carH * 0.6);
-    this.ctx.lineTo(-carW * 0.2, -carH);
-    this.ctx.lineTo(carW * 0.2, -carH);
-    this.ctx.lineTo(carW * 0.38, -carH * 0.6);
-    this.ctx.lineTo(carW / 2, 10);
-    this.ctx.lineTo(carW * 0.3, 14);
-    this.ctx.lineTo(-carW * 0.3, 14);
+    this.ctx.moveTo(-carW / 2, 8);
+    this.ctx.lineTo(-carW * 0.35, -carH * 0.6);
+    this.ctx.lineTo(-carW * 0.18, -carH);
+    this.ctx.lineTo(carW * 0.18, -carH);
+    this.ctx.lineTo(carW * 0.35, -carH * 0.6);
+    this.ctx.lineTo(carW / 2, 8);
+    this.ctx.lineTo(carW * 0.3, 12);
+    this.ctx.lineTo(-carW * 0.3, 12);
     this.ctx.closePath();
     this.ctx.fill();
     this.ctx.stroke();
 
-    // Twin High-Intensity Taillights
+    // Twin Taillights
     this.ctx.fillStyle = '#ff0055';
     this.ctx.shadowColor = '#ff0055';
-    this.ctx.shadowBlur = 20;
-    this.ctx.fillRect(-carW * 0.42, -5, 24, 7);
-    this.ctx.fillRect(carW * 0.42 - 24, -5, 24, 7);
+    this.ctx.shadowBlur = 16;
+    this.ctx.fillRect(-carW * 0.4, -4, 20, 6);
+    this.ctx.fillRect(carW * 0.4 - 20, -4, 20, 6);
 
     // Nitro Jet Flames
-    const isBoosting = this.speed > 240;
-    const flameLen = isBoosting ? 40 + Math.random() * 25 : 15 + Math.random() * 10;
-    const flameGrad = this.ctx.createLinearGradient(0, 10, 0, 10 + flameLen);
+    const isBoosting = this.speed > 220;
+    const fLen = isBoosting ? 38 + Math.random() * 22 : 14 + Math.random() * 8;
+    const flameGrad = this.ctx.createLinearGradient(0, 8, 0, 8 + fLen);
     flameGrad.addColorStop(0, '#ffffff');
     flameGrad.addColorStop(0.3, '#00f0ff');
     flameGrad.addColorStop(1, 'rgba(255, 0, 119, 0)');
 
     this.ctx.fillStyle = flameGrad;
     this.ctx.beginPath();
-    this.ctx.moveTo(-16, 12);
-    this.ctx.lineTo(0, 12 + flameLen);
-    this.ctx.lineTo(16, 12);
+    this.ctx.moveTo(-14, 10);
+    this.ctx.lineTo(0, 10 + fLen);
+    this.ctx.lineTo(14, 10);
     this.ctx.closePath();
     this.ctx.fill();
 
     this.ctx.restore();
   }
 
-  // ==========================================
-  // 6. MAIN ANIMATION LOOP
-  // ==========================================
   loop(timestamp) {
     if (!this.lastTime) this.lastTime = timestamp;
-    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1); // Clamp delta
+    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
     this.lastTime = timestamp;
 
     this.update(dt);
@@ -1657,9 +1640,8 @@ class NeonRacer {
   }
 }
 
-// Launch Game once DOM finishes parsing
 window.addEventListener('DOMContentLoaded', () => {
-  window.racerGame = new NeonRacer();
+  window.racer = new NeonRacer();
 });
 </script>
 </body>
